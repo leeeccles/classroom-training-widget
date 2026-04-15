@@ -258,40 +258,59 @@
 
     /* ─── RESPONSIVE ────────────────────────────────────────── */
 
-    /* Medium: keep top side-by-side, bottom goes 2 columns */
-    @media (max-width: 1000px) {
-      .lle-bottom {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Smaller laptop: tighten padding */
-    @media (max-width: 840px) {
+    /* Laptop: tighten spacing but keep 3 columns intact */
+    @media (max-width: 900px) {
       .lle-widget {
-        padding: 22px 24px 26px;
+        padding: 20px 22px 24px;
       }
       .lle-top {
-        gap: 24px;
-      }
-    }
-
-    /* Small: stack top, 1-column bottom */
-    @media (max-width: 620px) {
-      .lle-top {
-        flex-direction: column;
-      }
-      .lle-image-panel {
-        flex: none;
+        gap: 20px;
       }
       .lle-image-panel img {
-        max-height: 220px;
-        min-height: 160px;
+        min-height: 190px;
+        max-height: 260px;
       }
       .lle-bottom {
-        grid-template-columns: 1fr;
+        gap: 14px;
       }
-      .lle-widget {
-        padding: 18px 18px 22px;
+      .lle-card {
+        padding: 9px 11px;
+        gap: 9px;
+      }
+      .lle-icon-tile {
+        width: 32px;
+        height: 32px;
+      }
+      .lle-session-title {
+        font-size: 11.5px;
+      }
+      .lle-col-heading {
+        font-size: 12px;
+      }
+      .lle-divider {
+        margin: 20px 0;
+      }
+    }
+
+    /* Narrow laptop: further condense but still 3 columns */
+    @media (max-width: 700px) {
+      .lle-top {
+        gap: 16px;
+      }
+      .lle-bottom {
+        gap: 10px;
+      }
+      .lle-card {
+        padding: 8px 10px;
+        gap: 8px;
+      }
+      .lle-icon-tile {
+        width: 28px;
+        height: 28px;
+      }
+      .lle-icon-tile svg {
+        width: 14px;
+        height: 14px;
       }
     }
   </style>
