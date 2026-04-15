@@ -489,15 +489,5 @@
 
   </article>
 
-  <script>
-    function sendHeight() {
-      const height = document.body.scrollHeight;
-      window.parent.postMessage({ iframeHeight: height }, '*');
-    }
-    window.addEventListener('load', sendHeight);
-    window.addEventListener('resize', sendHeight);
-    new ResizeObserver(sendHeight).observe(document.body);
-  </script>
-
 </body>
 </html>
