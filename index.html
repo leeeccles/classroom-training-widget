@@ -24,7 +24,7 @@
     /* ── WIDGET SHELL ─────────────────────────────────── */
     .lle-widget {
       background: #FFFFFF;
-      border: 1px solid #E5E7EB;
+      border: 1px solid #D1D5DB;
       border-radius: 12px;
       flex: 1;
       display: flex;
@@ -34,7 +34,7 @@
 
     /* ── HEADER ───────────────────────────────────────── */
     .lle-header {
-      padding: 18px 22px 16px;
+      padding: 14px 22px 12px;
       flex-shrink: 0;
     }
 
@@ -42,7 +42,7 @@
       font-size: 22px;
       font-weight: 800;
       color: #111827;
-      letter-spacing: -0.4px;
+      letter-spacing: -0.3px;
       line-height: 1.15;
     }
 
@@ -55,7 +55,21 @@
       justify-content: center;
       gap: 8px;
       overflow: hidden;
-      padding: 12px 0;
+      padding: 10px 0;
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 5%,
+        #000 95%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 5%,
+        #000 95%,
+        transparent 100%
+      );
     }
 
     .lle-mq-row { display: flex; overflow: visible; }
@@ -63,7 +77,7 @@
     .lle-mq-track {
       display: flex;
       gap: 8px;
-      animation: mq-left 50s linear infinite;
+      animation: mq-left 40s linear infinite;
       width: max-content;
       flex-shrink: 0;
     }
@@ -83,10 +97,12 @@
       to   { transform: translateX(0); }
     }
 
+    .lle-strip:hover .lle-mq-track,
+    .lle-strip:hover .lle-mq-track--reverse { animation-play-state: paused; }
+
     @media (prefers-reduced-motion: reduce) {
-      .lle-dot                       { animation: none; }
       .lle-mq-track,
-      .lle-mq-track--reverse         { animation-play-state: paused; }
+      .lle-mq-track--reverse { animation-play-state: paused; }
     }
 
     .lle-mq-card {
@@ -94,12 +110,12 @@
       align-items: center;
       gap: 7px;
       padding: 5px 10px;
-      background: #F4F4F5;
+      background: #F9FAFB;
       border: 1px solid #E5E7EB;
       border-radius: 6px;
       white-space: nowrap;
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
       color: #374151;
       flex-shrink: 0;
     }
@@ -107,7 +123,7 @@
     .lle-mq-pip { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .lle-mq-pip.purple { background: #818CF8; }
     .lle-mq-pip.green  { background: #34D399; }
-    .lle-mq-pip.amber  { background: #FBBF24; }
+    .lle-mq-pip.amber  { background: #D97706; }
 
     /* ── CTA BAR ──────────────────────────────────────── */
     .lle-cta {
@@ -117,7 +133,7 @@
       background: #F9FAFB;
       border-top: 1px solid #E5E7EB;
       text-decoration: none;
-      padding: 13px 22px;
+      padding: 12px 22px;
       min-height: 44px;
       flex-shrink: 0;
       transition: background 0.12s ease;
@@ -129,9 +145,9 @@
     .lle-cta:focus-visible { outline: 2px solid #111827; outline-offset: -2px; }
 
     .lle-cta-meta {
-      font-size: 11.5px;
-      font-weight: 500;
-      color: #9CA3AF;
+      font-size: 11px;
+      font-weight: 400;
+      color: #6B7280;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
@@ -143,7 +159,7 @@
       font-size: 13px;
       font-weight: 700;
       color: #111827;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.02em;
     }
 
     /* ── RESPONSIVE ───────────────────────────────────── */
