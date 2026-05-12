@@ -23,8 +23,8 @@
 
     /* ── WIDGET SHELL ─────────────────────────────────── */
     .lle-widget {
-      background: #18181B;
-      border: 1px solid #27272A;
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
       border-radius: 12px;
       flex: 1;
       display: flex;
@@ -34,28 +34,19 @@
 
     /* ── HEADER ───────────────────────────────────────── */
     .lle-header {
-      display: grid;
-      grid-template-columns: 50% 50%;
-      flex: 1;
-      min-height: 90px;
+      padding: 14px 22px 12px;
+      flex-shrink: 0;
     }
 
-    .lle-header-body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 16px 22px;
-    }
-
-    .lle-header-badge {
+    .lle-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.65);
+      color: #9CA3AF;
       letter-spacing: 0.02em;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
 
     .lle-dot {
@@ -72,43 +63,41 @@
       50%       { opacity: 0.5; transform: scale(0.72); }
     }
 
-    .lle-header-title {
-      font-size: 21px;
+    .lle-title {
+      font-size: 18px;
       font-weight: 800;
-      color: #FFFFFF;
-      letter-spacing: -0.4px;
+      color: #111827;
+      letter-spacing: -0.3px;
       line-height: 1.15;
     }
 
-    /* ── MARQUEE ──────────────────────────────────────── */
-    .lle-header-marquee {
-      position: relative;
-      overflow: hidden;
+    /* ── MARQUEE STRIP ────────────────────────────────── */
+    .lle-strip {
+      background: #18181B;
+      flex: 1;
+      min-height: 64px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 8px;
-      padding: 16px 0;
+      gap: 7px;
+      overflow: hidden;
       -webkit-mask-image: linear-gradient(
         to right,
         transparent 0%,
-        #000 10%,
-        #000 88%,
+        #000 5%,
+        #000 95%,
         transparent 100%
       );
       mask-image: linear-gradient(
         to right,
         transparent 0%,
-        #000 10%,
-        #000 88%,
+        #000 5%,
+        #000 95%,
         transparent 100%
       );
     }
 
-    .lle-mq-row {
-      display: flex;
-      overflow: visible;
-    }
+    .lle-mq-row { display: flex; overflow: visible; }
 
     .lle-mq-track {
       display: flex;
@@ -143,24 +132,18 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 6px 11px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.11);
-      border-radius: 8px;
+      padding: 5px 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
       white-space: nowrap;
       font-size: 11px;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.78);
+      color: rgba(255, 255, 255, 0.8);
       flex-shrink: 0;
     }
 
-    .lle-mq-pip {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
+    .lle-mq-pip { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .lle-mq-pip.purple { background: #818CF8; }
     .lle-mq-pip.green  { background: #34D399; }
     .lle-mq-pip.amber  { background: #FBBF24; }
@@ -170,9 +153,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #F4F4F5;
+      background: #FFFFFF;
       text-decoration: none;
-      padding: 13px 24px;
+      padding: 12px 22px;
       min-height: 44px;
       flex-shrink: 0;
       transition: background 0.12s ease;
@@ -180,36 +163,32 @@
       touch-action: manipulation;
     }
 
-    .lle-cta:hover         { background: #E4E4E7; }
-    .lle-cta:focus-visible { outline: 2px solid rgba(0,0,0,0.25); outline-offset: -2px; }
+    .lle-cta:hover         { background: #F9FAFB; }
+    .lle-cta:focus-visible { outline: 2px solid #111827; outline-offset: -2px; }
 
     .lle-cta-meta {
       font-size: 11.5px;
       font-weight: 500;
-      color: #71717A;
+      color: #9CA3AF;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .lle-cta-action {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 13px;
       font-weight: 700;
-      color: #18181B;
+      color: #111827;
       letter-spacing: 0.01em;
     }
 
     /* ── RESPONSIVE ───────────────────────────────────── */
-    @media (max-width: 760px) {
-      .lle-header { grid-template-columns: 60% 40%; }
-    }
-
     @media (max-width: 520px) {
-      .lle-header            { grid-template-columns: 1fr; }
-      .lle-header-marquee    { display: none; }
-      .lle-header-body       { padding: 14px 18px; }
+      .lle-cta-meta { display: none; }
+      .lle-header   { padding: 12px 18px 10px; }
+      .lle-cta      { padding: 12px 18px; justify-content: flex-end; }
     }
   </style>
 </head>
@@ -219,50 +198,46 @@
 
     <!-- ── HEADER ────────────────────────────────────────── -->
     <div class="lle-header">
+      <div class="lle-badge">
+        <span class="lle-dot" aria-hidden="true"></span>
+        Instructor-led sessions
+      </div>
+      <h1 class="lle-title">Live Learning Events</h1>
+    </div>
 
-      <div class="lle-header-body">
-        <span class="lle-header-badge">
-          <span class="lle-dot" aria-hidden="true"></span>
-          Instructor-led sessions
-        </span>
-        <h1 class="lle-header-title">Live Learning Events</h1>
+    <!-- ── MARQUEE STRIP ─────────────────────────────────── -->
+    <div class="lle-strip" aria-hidden="true">
+
+      <!-- Row 1: scrolls left -->
+      <div class="lle-mq-row">
+        <div class="lle-mq-track">
+          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
+          <!-- duplicate for seamless loop -->
+          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
+        </div>
       </div>
 
-      <!-- Marquee ─────────────────────────────────────────── -->
-      <div class="lle-header-marquee" aria-hidden="true">
-
-        <!-- Row 1: scrolls left -->
-        <div class="lle-mq-row">
-          <div class="lle-mq-track">
-            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
-            <!-- duplicate for seamless loop -->
-            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
-          </div>
+      <!-- Row 2: scrolls right -->
+      <div class="lle-mq-row">
+        <div class="lle-mq-track lle-mq-track--reverse">
+          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
+          <!-- duplicate for seamless loop -->
+          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
+          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
         </div>
-
-        <!-- Row 2: scrolls right -->
-        <div class="lle-mq-row">
-          <div class="lle-mq-track lle-mq-track--reverse">
-            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
-            <!-- duplicate for seamless loop -->
-            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
-            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
-          </div>
-        </div>
-
       </div>
 
     </div>
@@ -278,7 +253,7 @@
       <span class="lle-cta-action">
         Find your next session
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-          <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
     </a>
