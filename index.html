@@ -23,10 +23,9 @@
 
     /* ── WIDGET SHELL ─────────────────────────────────── */
     .lle-widget {
-      background: #FFFFFF;
-      border: 1px solid #E4E7EB;
+      background: #111111;
+      border: 1px solid #222222;
       border-radius: 12px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -36,25 +35,23 @@
     /* ── HEADER ───────────────────────────────────────── */
     .lle-header {
       display: grid;
-      grid-template-columns: 56% 44%;
-      height: 130px;
-      flex-shrink: 0;
-      background: #111111;
-      border-bottom: 1px solid #1f1f1f;
+      grid-template-columns: 50% 50%;
+      flex: 1;
+      min-height: 90px;
     }
 
     .lle-header-body {
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 26px 20px;
+      justify-content: center;
+      padding: 16px 22px;
     }
 
     .lle-header-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 600;
       color: rgba(255, 255, 255, 0.55);
       letter-spacing: 0.02em;
@@ -75,10 +72,8 @@
       50%       { opacity: 0.5; transform: scale(0.72); }
     }
 
-    @media (prefers-reduced-motion: reduce) { .lle-dot { animation: none; } }
-
     .lle-header-title {
-      font-size: clamp(18px, 2.1vw, 22px);
+      font-size: 20px;
       font-weight: 800;
       color: #FFFFFF;
       letter-spacing: -0.4px;
@@ -97,132 +92,90 @@
       font-weight: 700;
     }
 
-    .lle-header-img {
+    /* ── MARQUEE ──────────────────────────────────────── */
+    .lle-header-marquee {
       position: relative;
       overflow: hidden;
-    }
-
-    .lle-header-img::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to right,
-        #111111 0%,
-        rgba(17, 17, 17, 0.55) 40%,
-        rgba(17, 17, 17, 0.12) 100%
-      );
-      pointer-events: none;
-    }
-
-    .lle-header-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: 55% 32%;
-      display: block;
-    }
-
-    /* ── SESSIONS GRID ────────────────────────────────── */
-    .lle-sessions {
-      flex: 1;
-      padding: 18px 22px 14px;
-      overflow: hidden;
-    }
-
-    .lle-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      height: 100%;
-    }
-
-    /* Category column */
-    .lle-col {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      min-width: 0;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 0;
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 10%,
+        #000 88%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 10%,
+        #000 88%,
+        transparent 100%
+      );
     }
 
-    /* Category header */
-    .lle-col-head {
+    .lle-mq-row {
       display: flex;
+      overflow: visible;
+    }
+
+    .lle-mq-track {
+      display: flex;
+      gap: 8px;
+      animation: mq-left 28s linear infinite;
+      width: max-content;
+      flex-shrink: 0;
+    }
+
+    .lle-mq-track--reverse {
+      animation-name: mq-right;
+      animation-duration: 34s;
+    }
+
+    @keyframes mq-left {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @keyframes mq-right {
+      from { transform: translateX(-50%); }
+      to   { transform: translateX(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .lle-dot                       { animation: none; }
+      .lle-mq-track,
+      .lle-mq-track--reverse         { animation-play-state: paused; }
+    }
+
+    .lle-mq-card {
+      display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #E9EBEE;
-      margin-bottom: 1px;
-      flex-shrink: 0;
-    }
-
-    .lle-col-icon {
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .lle-col-icon.purple { background: #EEF2FF; }
-    .lle-col-icon.green  { background: #ECFDF5; }
-    .lle-col-icon.amber  { background: #FFFBEB; }
-
-    .lle-col-name {
-      font-size: 11.5px;
-      font-weight: 700;
-      color: #111827;
-      flex: 1;
-      min-width: 0;
-    }
-
-    /* Session card */
-    .lle-card {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      border: 1px solid #E9EBEE;
+      padding: 6px 11px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.11);
       border-radius: 8px;
-      padding: 10px 12px;
-      text-decoration: none;
-      cursor: pointer;
-      background: #FFFFFF;
-      transition: background 0.12s ease, border-color 0.12s ease, transform 0.1s ease;
-    }
-
-    .lle-card:hover {
-      background: #F9FAFB;
-      border-color: #C8CACF;
-      transform: translateY(-1px);
-    }
-
-    .lle-card:active         { transform: translateY(0); }
-    .lle-card:focus-visible  { outline: 2px solid #111111; outline-offset: 2px; }
-
-    .lle-tile {
-      width: 32px;
-      height: 32px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.78);
       flex-shrink: 0;
     }
 
-    .lle-tile.purple { background: #EEF2FF; }
-    .lle-tile.green  { background: #ECFDF5; }
-    .lle-tile.amber  { background: #FFFBEB; }
-
-    .lle-card-title {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #1F2937;
-      line-height: 1.38;
-      flex: 1;
-      min-width: 0;
+    .lle-mq-pip {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
+
+    .lle-mq-pip.purple { background: #818CF8; }
+    .lle-mq-pip.green  { background: #34D399; }
+    .lle-mq-pip.amber  { background: #FBBF24; }
 
     /* ── CTA BAR ──────────────────────────────────────── */
     .lle-cta {
@@ -230,42 +183,33 @@
       align-items: center;
       justify-content: center;
       gap: 9px;
-      background: #111111;
-      color: #FFFFFF;
+      background: #FFFFFF;
+      color: #111111;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 700;
       text-decoration: none;
-      padding: 15px 24px;
+      padding: 13px 24px;
+      min-height: 44px;
       flex-shrink: 0;
       letter-spacing: 0.01em;
       transition: background 0.12s ease;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
-    .lle-cta:hover         { background: #1a1a1a; }
-    .lle-cta:focus-visible { outline: 2px solid rgba(255,255,255,0.4); outline-offset: -2px; }
+    .lle-cta:hover         { background: #F3F4F6; }
+    .lle-cta:focus-visible { outline: 2px solid rgba(0,0,0,0.3); outline-offset: -2px; }
 
     /* ── RESPONSIVE ───────────────────────────────────── */
-    @media (max-width: 1180px) {
-      .lle-header-body { padding: 0 22px 18px; }
-      .lle-sessions    { padding: 16px 18px 12px; }
-      .lle-grid        { gap: 12px; }
-    }
-
     @media (max-width: 760px) {
-      .lle-header { grid-template-columns: 65% 35%; }
-    }
-
-    @media (max-width: 580px) {
-      .lle-header     { grid-template-columns: 1fr; height: auto; }
-      .lle-header-img { display: none; }
-      .lle-header-body { padding: 18px 20px; }
+      .lle-header { grid-template-columns: 60% 40%; }
     }
 
     @media (max-width: 520px) {
-      .lle-grid     { grid-template-columns: 1fr; }
-      .lle-sessions { overflow-y: auto; }
+      .lle-header            { grid-template-columns: 1fr; }
+      .lle-header-marquee    { display: none; }
+      .lle-header-body       { padding: 14px 18px; }
     }
   </style>
 </head>
@@ -288,159 +232,43 @@
         </p>
       </div>
 
-      <div class="lle-header-img" aria-hidden="true">
-        <img
-          src="austin-distel-rxpThOwuVgE-unsplash.jpg"
-          alt=""
-          width="800"
-          height="600"
-        >
-      </div>
+      <!-- Marquee ─────────────────────────────────────────── -->
+      <div class="lle-header-marquee" aria-hidden="true">
 
-    </div>
-
-    <!-- ── SESSIONS ──────────────────────────────────────── -->
-    <div class="lle-sessions">
-      <div class="lle-grid" role="list" aria-label="Session categories">
-
-        <!-- AI & Data -->
-        <div class="lle-col" role="listitem">
-          <div class="lle-col-head">
-            <span class="lle-col-icon purple" aria-hidden="true">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                <path d="M7 1.5l2 2.5H7.8v2.8H6.2V4H5L7 1.5z" fill="#6366F1"/>
-                <path d="M3 9.5h8M5 11.5h4M6 13h2" stroke="#6366F1" stroke-width="1.1" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <span class="lle-col-name">AI &amp; Data</span>
+        <!-- Row 1: scrolls left -->
+        <div class="lle-mq-row">
+          <div class="lle-mq-track">
+            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
+            <!-- duplicate for seamless loop -->
+            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
           </div>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile purple" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <rect x="2" y="3" width="9" height="7" rx="1.2" stroke="#6366F1" stroke-width="1.3"/>
-                <path d="M13 4h2M13 6.5h2" stroke="#6366F1" stroke-width="1.3" stroke-linecap="round"/>
-                <path d="M3 13l2.5-3.5 2 2.5 2.5-4 3 5H3z" stroke="#6366F1" stroke-width="1.2" stroke-linejoin="round" fill="#C7D2FE" fill-opacity="0.35"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">AI-Powered PowerPoint Design</span>
-          </a>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile purple" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <rect x="2" y="2" width="14" height="14" rx="2" stroke="#6366F1" stroke-width="1.3"/>
-                <path d="M5 12l3-4.5 2.5 3 2.5-4.5" stroke="#6366F1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Bring Data to Life Effectively at Work</span>
-          </a>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile purple" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="6.5" stroke="#6366F1" stroke-width="1.3"/>
-                <circle cx="9" cy="9" r="2.5" fill="#C7D2FE" fill-opacity="0.5" stroke="#6366F1" stroke-width="1.2"/>
-                <path d="M9 2.5v2M9 13.5v2M2.5 9h2M13.5 9h2" stroke="#6366F1" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Using AI Effectively at Work</span>
-          </a>
         </div>
 
-        <!-- Business Fundamentals -->
-        <div class="lle-col" role="listitem">
-          <div class="lle-col-head">
-            <span class="lle-col-icon green" aria-hidden="true">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                <path d="M2 12V7l5-5 5 5v5H2z" stroke="#059669" stroke-width="1.1" stroke-linejoin="round"/>
-                <rect x="5" y="9" width="4" height="3" rx="0.5" stroke="#059669" stroke-width="1.1"/>
-              </svg>
-            </span>
-            <span class="lle-col-name">Business Fundamentals</span>
+        <!-- Row 2: scrolls right -->
+        <div class="lle-mq-row">
+          <div class="lle-mq-track lle-mq-track--reverse">
+            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
+            <!-- duplicate for seamless loop -->
+            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
+            <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
           </div>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile green" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <rect x="2" y="4.5" width="14" height="9" rx="1.5" stroke="#059669" stroke-width="1.3"/>
-                <path d="M6 9h6M6 12h4" stroke="#059669" stroke-width="1.3" stroke-linecap="round"/>
-                <path d="M9 4.5V2.5M6.5 2.5h5" stroke="#059669" stroke-width="1.3" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Finance for Non-Finance Managers</span>
-          </a>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile green" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <path d="M3 14l3.5-5 2.5 3 3-4 3.5 6H3z" stroke="#059669" stroke-width="1.3" stroke-linejoin="round" fill="#BBF7D0" fill-opacity="0.35"/>
-                <circle cx="13.5" cy="5.5" r="2.5" stroke="#059669" stroke-width="1.3"/>
-                <path d="M13.5 4v1.5l1 1" stroke="#059669" stroke-width="1.1" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Understanding Business Strategy</span>
-          </a>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile green" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <rect x="2" y="2" width="14" height="14" rx="2" stroke="#059669" stroke-width="1.3"/>
-                <path d="M5 12.5l3.5-5 2.5 3.5 2-3" stroke="#059669" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="5" cy="12.5" r="1" fill="#059669"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Data-Driven Decision Making</span>
-          </a>
-        </div>
-
-        <!-- Performance Skills -->
-        <div class="lle-col" role="listitem">
-          <div class="lle-col-head">
-            <span class="lle-col-icon amber" aria-hidden="true">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="5" r="2.5" stroke="#D97706" stroke-width="1.1"/>
-                <path d="M2 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#D97706" stroke-width="1.1" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <span class="lle-col-name">Performance Skills</span>
-          </div>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile amber" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <path d="M3 5.5a2 2 0 012-2h8a2 2 0 012 2v6a2 2 0 01-2 2H7.5L3 15.5V5.5z" stroke="#D97706" stroke-width="1.3" stroke-linejoin="round"/>
-                <path d="M6.5 8.5h5M6.5 11h3.5" stroke="#D97706" stroke-width="1.3" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Handle Difficult Conversations</span>
-          </a>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile amber" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <circle cx="6.5" cy="7" r="2.5" stroke="#D97706" stroke-width="1.3"/>
-                <circle cx="12" cy="7" r="2.5" stroke="#D97706" stroke-width="1.3"/>
-                <path d="M2.5 15c0-2.21 1.79-4 4-4" stroke="#D97706" stroke-width="1.3" stroke-linecap="round"/>
-                <path d="M8.5 15c0-2.21 1.79-4 4-4" stroke="#D97706" stroke-width="1.3" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Effective Business Conversations</span>
-          </a>
-
-          <a href="#" class="lle-card" tabindex="0">
-            <div class="lle-tile amber" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <rect x="2" y="2.5" width="14" height="9" rx="1.5" stroke="#D97706" stroke-width="1.3"/>
-                <path d="M7 15.5h4M9 11.5v4" stroke="#D97706" stroke-width="1.3" stroke-linecap="round"/>
-                <path d="M5.5 7.5l2 2 5-5" stroke="#D97706" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <span class="lle-card-title">Maximise Your Presentation Impact</span>
-          </a>
         </div>
 
       </div>
+
     </div>
 
     <!-- ── CTA BAR ───────────────────────────────────────── -->
@@ -451,15 +279,15 @@
       rel="noopener noreferrer"
     >
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-        <rect x="1" y="2.5" width="12" height="10" rx="1.8" stroke="white" stroke-width="1.3"/>
-        <path d="M4 1.5V3.5M10 1.5V3.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
-        <path d="M1 5.5h12" stroke="white" stroke-width="1.3"/>
-        <rect x="3.5" y="7.5" width="2" height="2" rx="0.4" fill="white"/>
-        <rect x="8.5" y="7.5" width="2" height="2" rx="0.4" fill="white"/>
+        <rect x="1" y="2.5" width="12" height="10" rx="1.8" stroke="#111111" stroke-width="1.3"/>
+        <path d="M4 1.5V3.5M10 1.5V3.5" stroke="#111111" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M1 5.5h12" stroke="#111111" stroke-width="1.3"/>
+        <rect x="3.5" y="7.5" width="2" height="2" rx="0.4" fill="#111111"/>
+        <rect x="8.5" y="7.5" width="2" height="2" rx="0.4" fill="#111111"/>
       </svg>
       Find your next session
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-        <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="#111111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
 
