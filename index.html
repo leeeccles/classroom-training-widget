@@ -6,7 +6,7 @@
   <title>Live Learning Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,10 +21,25 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ── WIDGET SHELL ─────────────────────────────────── */
-    .lle-widget {
-      background: #FFFFFF;
-      border: 1px solid #D1D5DB;
+    /* ── TOKENS ──────────────────────────────────────── */
+    :root {
+      --blue:      #2563EB;
+      --blue-h:    #1D4ED8;
+      --blue-50:   #EFF6FF;
+      --blue-100:  #DBEAFE;
+      --text:      #111827;
+      --text-2:    #6B7280;
+      --text-3:    #4B5563;
+      --border:    #E5E7EB;
+      --white:     #FFFFFF;
+      --green:     #16A34A;
+      --green-dot: #22C55E;
+    }
+
+    /* ── WIDGET SHELL ────────────────────────────────── */
+    .widget {
+      background: var(--white);
+      border: 1px solid var(--border);
       border-radius: 12px;
       flex: 1;
       display: flex;
@@ -32,207 +47,449 @@
       overflow: hidden;
     }
 
-    /* ── HEADER ───────────────────────────────────────── */
-    .lle-header {
-      padding: 14px 22px 8px;
-      flex-shrink: 0;
-    }
-
-    .lle-title {
-      font-size: 22px;
-      font-weight: 800;
-      color: #111827;
-      letter-spacing: -0.3px;
-      line-height: 1.15;
-    }
-
-    /* ── MARQUEE STRIP ────────────────────────────────── */
-    .lle-strip {
-      flex: 1;
-      min-height: 72px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 8px;
-      overflow: hidden;
-      padding: 10px 0;
-      -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        #000 5%,
-        #000 95%,
-        transparent 100%
-      );
-      mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        #000 5%,
-        #000 95%,
-        transparent 100%
-      );
-    }
-
-    .lle-mq-row { display: flex; overflow: visible; }
-
-    .lle-mq-track {
-      display: flex;
-      gap: 8px;
-      animation: mq-left 40s linear infinite;
-      width: max-content;
-      flex-shrink: 0;
-    }
-
-    .lle-mq-track--reverse {
-      animation-name: mq-right;
-      animation-duration: 62s;
-    }
-
-    @keyframes mq-left {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    @keyframes mq-right {
-      from { transform: translateX(-50%); }
-      to   { transform: translateX(0); }
-    }
-
-    .lle-strip:hover .lle-mq-track,
-    .lle-strip:hover .lle-mq-track--reverse { animation-play-state: paused; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .lle-mq-track,
-      .lle-mq-track--reverse { animation-play-state: paused; }
-    }
-
-    .lle-mq-card {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 5px 10px;
-      background: #F9FAFB;
-      border: 1px solid #E5E7EB;
-      border-radius: 6px;
-      white-space: nowrap;
-      font-size: 12px;
-      font-weight: 500;
-      color: #374151;
-      flex-shrink: 0;
-    }
-
-    .lle-mq-pip { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .lle-mq-pip.purple { background: #818CF8; }
-    .lle-mq-pip.green  { background: #34D399; }
-    .lle-mq-pip.amber  { background: #D97706; }
-
-    /* ── CTA BAR ──────────────────────────────────────── */
-    .lle-cta {
+    /* ── HEADER ──────────────────────────────────────── */
+    .w-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #F9FAFB;
-      border-top: 1px solid #E5E7EB;
-      text-decoration: none;
-      padding: 12px 22px;
-      min-height: 44px;
+      padding: 14px 20px 12px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
       flex-shrink: 0;
-      transition: background 0.12s ease;
+    }
+
+    .h-left {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .h-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--blue);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .h-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .h-sub {
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .h-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--blue);
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-height: 34px;
+      transition: background 0.15s ease;
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+
+    .h-cta:hover        { background: var(--blue-h); }
+    .h-cta:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+    /* ── BODY ────────────────────────────────────────── */
+    .w-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── LEFT: NEXT UP ───────────────────────────────── */
+    .p-next {
+      padding: 14px 16px 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      border-right: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    .next-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .next-time {
+      font-size: 11px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    .next-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.25;
+      letter-spacing: -0.2px;
+    }
+
+    .instructor {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .av {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .instructor-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .instructor-role {
+      font-size: 10px;
+      color: var(--text-2);
+      line-height: 1.3;
+    }
+
+    .reserve-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--blue);
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 14px;
+      border-radius: 8px;
+      min-height: 36px;
+      transition: background 0.15s ease;
       cursor: pointer;
       touch-action: manipulation;
     }
 
-    .lle-cta:hover         { background: #F3F4F6; }
-    .lle-cta:focus-visible { outline: 2px solid #111827; outline-offset: -2px; }
+    .reserve-btn:hover        { background: var(--blue-h); }
+    .reserve-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-    .lle-cta-meta {
-      font-size: 11px;
-      font-weight: 400;
-      color: #6B7280;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .lle-cta-action {
+    .attending-row {
       display: flex;
       align-items: center;
       gap: 7px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      color: #111827;
-      letter-spacing: 0.02em;
+      margin-top: auto;
     }
 
-    /* ── RESPONSIVE ───────────────────────────────────── */
-    @media (max-width: 520px) {
-      .lle-cta-meta { display: none; }
-      .lle-header   { padding: 12px 18px 10px; }
-      .lle-cta      { padding: 12px 18px; justify-content: flex-end; }
+    .av-stack { display: flex; }
+
+    .av-stack .av {
+      width: 22px;
+      height: 22px;
+      font-size: 8px;
+      border: 2px solid var(--white);
+      margin-left: -6px;
+    }
+
+    .av-stack .av:first-child { margin-left: 0; }
+
+    .attending-text {
+      font-size: 11px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    .live-pill {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-dot);
+      flex-shrink: 0;
+    }
+
+    /* ── RIGHT: THIS WEEK ────────────────────────────── */
+    .p-week {
+      padding: 14px 20px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .week-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .days-grid { display: flex; gap: 3px; }
+
+    .day {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 3px;
+      border-radius: 8px;
+      gap: 3px;
+    }
+
+    .day.today { background: var(--blue); }
+
+    .d-name {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .day.today .d-name { color: rgba(255,255,255,0.75); }
+
+    .d-date {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .day.today .d-date { color: var(--white); }
+
+    .d-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--blue-50);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .day.today .d-circle {
+      background: rgba(255,255,255,0.2);
+      color: var(--white);
+    }
+
+    .d-sessions {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--text-3);
+    }
+
+    .day.today .d-sessions { color: rgba(255,255,255,0.7); }
+
+    .week-banner {
+      background: var(--blue-50);
+      border-radius: 8px;
+      padding: 9px 12px;
+      margin-top: auto;
+    }
+
+    .banner-headline {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .banner-body {
+      font-size: 10px;
+      color: var(--text-2);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 480px) {
+      .w-body          { grid-template-columns: 1fr; }
+      .p-next          { border-right: none; border-bottom: 1px solid var(--border); }
+      .h-sub           { display: none; }
+      .w-header        { padding: 12px 16px 10px; }
+      .p-next, .p-week { padding: 12px 16px; }
     }
   </style>
 </head>
 <body>
 
-  <article class="lle-widget" role="region" aria-label="Live Learning Events">
+  <article class="widget" role="region" aria-label="Live Learning Events">
 
-    <!-- ── HEADER ────────────────────────────────────────── -->
-    <div class="lle-header">
-      <h1 class="lle-title">Live Learning Events</h1>
-    </div>
-
-    <!-- ── MARQUEE STRIP ─────────────────────────────────── -->
-    <div class="lle-strip" aria-hidden="true">
-
-      <!-- Row 1: scrolls left -->
-      <div class="lle-mq-row">
-        <div class="lle-mq-track">
-          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
-          <!-- duplicate for seamless loop -->
-          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>AI-Powered PowerPoint Design</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Finance for Non-Finance Managers</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Handle Difficult Conversations</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Bring Data to Life at Work</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Understanding Business Strategy</div>
+    <!-- HEADER -->
+    <header class="w-header">
+      <div class="h-left">
+        <div class="h-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2.5" y="4.5" width="17" height="15" rx="2.5" stroke="white" stroke-width="1.5"/>
+            <path d="M2.5 9h17" stroke="white" stroke-width="1.5"/>
+            <path d="M7 2.5v2M15 2.5v2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="6.5" y="12" width="3" height="2.5" rx="0.5" fill="white"/>
+            <rect x="12.5" y="12" width="3" height="2.5" rx="0.5" fill="white"/>
+          </svg>
+        </div>
+        <div>
+          <div class="h-title">Live Learning Events</div>
+          <div class="h-sub">Join expert-led sessions, connect with peers and build skills in real time.</div>
         </div>
       </div>
-
-      <!-- Row 2: scrolls right -->
-      <div class="lle-mq-row">
-        <div class="lle-mq-track lle-mq-track--reverse">
-          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
-          <!-- duplicate for seamless loop -->
-          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Effective Business Conversations</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip purple"></span>Using AI Effectively at Work</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip green"></span>Data-Driven Decision Making</div>
-          <div class="lle-mq-card"><span class="lle-mq-pip amber"></span>Maximise Your Presentation Impact</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ── CTA BAR ───────────────────────────────────────── -->
-    <a
-      class="lle-cta"
-      href="https://app.360learning.com/home/content/classrooms"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span class="lle-cta-meta">60 min &nbsp;&middot;&nbsp; Virtual &amp; in-person</span>
-      <span class="lle-cta-action">
-        Browse &amp; Book a Session
+      <a class="h-cta"
+         href="https://app.360learning.com/home/content/classrooms"
+         target="_blank"
+         rel="noopener noreferrer"
+         aria-label="See full calendar of live learning events">
+        See full calendar
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-          <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-      </span>
-    </a>
+      </a>
+    </header>
+
+    <!-- BODY -->
+    <div class="w-body">
+
+      <!-- LEFT: NEXT UP -->
+      <section class="p-next" aria-label="Next live session">
+        <div class="next-badge">Next up</div>
+        <div class="next-time">Today &middot; 2:00 PM GMT</div>
+        <h2 class="next-title">Bring Data to Life at Work</h2>
+        <div class="instructor">
+          <div class="av" style="background:#2563EB" aria-hidden="true">LE</div>
+          <div>
+            <div class="instructor-name">Lee Eccles</div>
+            <div class="instructor-role">Data Strategy Lead</div>
+          </div>
+        </div>
+        <a class="reserve-btn"
+           href="https://app.360learning.com/home/content/classrooms"
+           target="_blank"
+           rel="noopener noreferrer">
+          Reserve my spot
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <div class="attending-row">
+          <div class="av-stack" aria-hidden="true">
+            <div class="av" style="background:#7C3AED">AS</div>
+            <div class="av" style="background:#059669">MK</div>
+            <div class="av" style="background:#D97706">JP</div>
+          </div>
+          <span class="attending-text">+24 attending</span>
+          <span class="live-pill">
+            <span class="live-dot"></span>
+            Live session
+          </span>
+        </div>
+      </section>
+
+      <!-- RIGHT: THIS WEEK -->
+      <section class="p-week" aria-label="This week's live sessions">
+        <div class="week-label">This week at a glance</div>
+        <div class="days-grid" id="days-grid">
+          <!-- Populated by JS -->
+        </div>
+        <div class="week-banner">
+          <div class="banner-headline">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <circle cx="7" cy="7" r="5.5" stroke="#2563EB" stroke-width="1.5"/>
+              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="total-label">17 live sessions this week</span>
+          </div>
+          <div class="banner-body">Choose what works for you. All times shown in your local timezone.</div>
+        </div>
+      </section>
+
+    </div>
 
   </article>
+
+  <script>
+    /* ── Update session data here each week ─────────────
+       sessions: counts for Mon → Fri
+       total:    sum shown in the banner                  */
+    var WEEK = { sessions: [3, 4, 5, 3, 2], total: 17 };
+    /* ─────────────────────────────────────────────────── */
+
+    (function () {
+      var NAMES   = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+      var today   = new Date();
+      var dow     = today.getDay(); // 0=Sun … 6=Sat
+
+      var mon = new Date(today);
+      mon.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
+
+      var grid = document.getElementById('days-grid');
+
+      NAMES.forEach(function (name, i) {
+        var d = new Date(mon);
+        d.setDate(mon.getDate() + i);
+        var isToday = d.toDateString() === today.toDateString();
+
+        var col = document.createElement('div');
+        col.className = 'day' + (isToday ? ' today' : '');
+        col.setAttribute('aria-label',
+          name + ' ' + d.getDate() + ', ' + WEEK.sessions[i] +
+          ' sessions' + (isToday ? ' — today' : ''));
+
+        col.innerHTML =
+          '<span class="d-name">'   + name             + '</span>' +
+          '<span class="d-date">'   + d.getDate()      + '</span>' +
+          '<div  class="d-circle">' + WEEK.sessions[i] + '</div>'  +
+          '<span class="d-sessions">sessions</span>';
+
+        grid.appendChild(col);
+      });
+
+      document.getElementById('total-label').textContent =
+        WEEK.total + ' live sessions this week';
+    }());
+  </script>
 
 </body>
 </html>
