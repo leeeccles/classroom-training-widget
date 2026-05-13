@@ -40,7 +40,8 @@
     .widget {
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -85,7 +86,7 @@
     }
 
     .h-sub {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-2);
       line-height: 1.4;
       margin-top: 2px;
@@ -102,10 +103,10 @@
       font-size: 12px;
       font-weight: 700;
       padding: 8px 14px;
-      border-radius: 20px;
+      border-radius: 8px;
       white-space: nowrap;
       flex-shrink: 0;
-      min-height: 34px;
+      min-height: 44px;
       transition: background 0.15s ease;
       touch-action: manipulation;
       cursor: pointer;
@@ -127,7 +128,7 @@
       padding: 14px 16px 14px 20px;
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 9px;
       border-right: 1px solid var(--border);
       min-width: 0;
     }
@@ -135,7 +136,7 @@
     .next-badge {
       font-size: 10px;
       font-weight: 700;
-      color: var(--blue);
+      color: var(--text-3);
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
@@ -148,7 +149,7 @@
 
     .next-title {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
       color: var(--text);
       line-height: 1.25;
       letter-spacing: -0.2px;
@@ -199,9 +200,9 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 12px;
       font-weight: 700;
-      padding: 9px 14px;
+      padding: 10px 14px;
       border-radius: 8px;
-      min-height: 36px;
+      min-height: 44px;
       transition: background 0.15s ease;
       cursor: pointer;
       touch-action: manipulation;
@@ -263,18 +264,18 @@
 
     .week-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-2);
     }
 
-    .days-grid { display: flex; gap: 3px; }
+    .days-grid { display: flex; gap: 5px; }
 
     .day {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 3px;
+      padding: 6px 4px;
       border-radius: 8px;
       gap: 3px;
     }
@@ -289,7 +290,7 @@
       letter-spacing: 0.04em;
     }
 
-    .day.today .d-name { color: rgba(255,255,255,0.75); }
+    .day.today .d-name { color: var(--white); }
 
     .d-date {
       font-size: 13px;
@@ -306,24 +307,17 @@
       background: #F3F4F6;
       color: #374151;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .day.today .d-circle {
-      background: rgba(255,255,255,0.2);
-      color: var(--white);
+      background: rgba(255,255,255,0.9);
+      color: var(--blue);
     }
 
-    .d-sessions {
-      font-size: 9px;
-      font-weight: 500;
-      color: var(--text-3);
-    }
-
-    .day.today .d-sessions { color: rgba(255,255,255,0.7); }
 
     .week-banner {
       background: var(--blue-50);
@@ -338,7 +332,7 @@
       gap: 6px;
       font-size: 12px;
       font-weight: 700;
-      color: var(--blue);
+      color: var(--blue-h);
     }
 
     .banner-body {
@@ -438,8 +432,8 @@
         <div class="week-banner">
           <div class="banner-headline">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="5.5" stroke="#2563EB" stroke-width="1.5"/>
-              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="7" cy="7" r="5.5" stroke="#1D4ED8" stroke-width="1.5"/>
+              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#1D4ED8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span id="total-label">17 live sessions this week</span>
           </div>
@@ -482,8 +476,7 @@
         col.innerHTML =
           '<span class="d-name">'   + name             + '</span>' +
           '<span class="d-date">'   + d.getDate()      + '</span>' +
-          '<div  class="d-circle">' + WEEK.sessions[i] + '</div>'  +
-          '<span class="d-sessions">sessions</span>';
+          '<div  class="d-circle">' + WEEK.sessions[i] + '</div>';
 
         grid.appendChild(col);
       });
