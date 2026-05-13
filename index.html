@@ -173,6 +173,8 @@
       flex-shrink: 0;
     }
 
+    .av-photo { object-fit: cover; object-position: center top; }
+
     .instructor-name {
       font-size: 12px;
       font-weight: 600;
@@ -301,8 +303,8 @@
       width: 26px;
       height: 26px;
       border-radius: 50%;
-      background: var(--blue-50);
-      color: var(--blue);
+      background: #F3F4F6;
+      color: #374151;
       font-size: 12px;
       font-weight: 800;
       display: flex;
@@ -396,12 +398,12 @@
       <section class="p-next" aria-label="Next live session">
         <div class="next-badge">Next up</div>
         <div class="next-time" id="next-time"></div>
-        <h2 class="next-title">Bring Data to Life at Work</h2>
+        <h2 class="next-title">Using AI Effectively at Work</h2>
         <div class="instructor">
-          <div class="av" style="background:#2563EB" aria-hidden="true">LE</div>
+          <img class="av av-photo" src="data:image/webp;base64,UklGRrIFAABXRUJQVlA4IKYFAABQIACdASqAAIAAPm0ylEckIyIhKpJKmIANiWUG+BxTIthL5VN7cBoWbb73chAxX5JqvfMnlrK/DWBlmGq+xOk4PkznBLiFm/hNS/s4ufvTcZvQjrN6u5TjXtn36LungDs8VyQ9+VJtu0rytrhxCw3J89W4PfVTDsiQUxPXVheQPzhv7aSd5TD/rWjwA/x6mlEqwMEMJxkeY6z0ep21rjx3Pdbc7EeuSj+6QRXcfgkhxmWBUXt40Vtvlkb7+t8/9lBZzrYKylx3Jlm9mU9Le0Z7genS+SaHARGjRXrNgeNvxFd3DuI6Nw7I/54matSbw1BYI5Bx8c7COqh7DBB1/vHXVcSjhDj0BRcHjPwA/uZBfxcfxX5vdWPt/Dnk73sH8S4s+QzK5I7HLWsPLdoMKzORcjeIVy5RKRQ8ZPVoZt1njjw1TxovjnP3Meuxxqm2+RescCZNwyQBH+8j8AjQ52TW5YqoRKctCNeyZWXyrLinWnjf5rXW98R+CPo6MPQzstRbzHIN5vFJ64gFjY3RMMp30u7tgu4utzrEpq+zXfUcsGHW0Tp1LyR37302EgqZWe3YkyME3fuRakBebYq0Qwr/Wsb/HWzfsHAwYXCB93noVMWuaF/+nUXbm/p7dI0KXxNw7W9dR5gKu565hr3Dvz2Yf+2sgR0F+wdD3tP2+7Vh1f0nO1OtNZeItn1GaR1lU/j/zcbCv4Cq13v0fQ1wN6ayi0EHci1USDuGRjRf4CjJjihxuBh2Peg6teImyy4xnms+kc/8Y7GUA0aiHt0QbRWdCVRM7fVXQpfG/WUXLAvNTrCk2EC3fe5O+pKEji0PrII1pYT3GCkwPUTVDBtMb7MJFBJ9T8McMhLbfIoKCrWyKOhk3wZQPk+nJXtIPIPHfpTzmWjmVPUmPKOPNOx2Dy7hXGKtpqy3T/bAL0/roPXYxalKBA3quwweuc/XlYoUeis2BGMgNAEHLy2qb6/v//l7SQyLLWxbbe3TYIufFid8GnzFNOu1P+VFE1gBk2J9QW3SAu43oZGFfNxz2dQCl1rOnlI/5AJH8UZvTK5RAe+hHir4fyoXtc25qYz8sulsrixY2UaZ4Oa/vSQ31miFDMVePxa5w0QkipjSlkD/zH6SZp5PdYtQzpGtlb8s2oFlkWuFxxDa837q7lODfFHR7ElwcFCmN4hXtvoq63+ApGGbKT5vTrLcnC5ZKEwRs7+PGrIVMISSA35r+OvmSbiNrruk/h5bu74JNxW1jVasCadvHLSuQ7/PBfwNEUjVeV5jXtQaT40gu0+2HOXDUg7QFYWSM2EQTlPFz1QPG7ly2WsH/0itiOzYJZW1nJcSDW5zP8CSN+XEb7qSxFN+vuOqUXG3l9AHnK6cPMXdyjCuRJ1hVXTsN+AVPzy4kWCpzI4pHS4gmRnW8hl+aKDliJv72wSgOoYf/ucwl5tbsBEjhGRSOq29xuu9BSw3eCfvoEVjZo/4fVtbKNHhOG3SRQSGl6b5jTREZbJrDucF+AXCQ4gvdiIPPzSTsOT1ppstttQAjy6elwi0B/kV2UIRsBcGvgbaO5FM/0jmIGAeRJc6pwWxk6GAO+MSBi6RxPZP3DswrRIYNde2/q37nUtIomZSqKoXc0JxM1hHrTwkbv64Cz6989oMV5MSA5pSC1WCxhwqsIdNCOvBGk6iY7g9WjsLHz8SV3plZ7fDgNU+XOtfkQadveDdJMoE0cYeho1vLTy3miC64SRkUz0WkAsuYd8yjP5vRsaERdtjqqTFROFeg+l1kbK5LQ6mGoSf93PCMNazPjUJspG+OsBgG2SPU+OtQChAckVexmEvH1gSF2cLADFG2c8MSs7K5iwgtAMxFlx3w1bLA08rkXLVRQLMSIF0ozEsK8qFjtqSBJHyjE8WLwI536t9S1o9cMRvEs2XXugB/6/7QTLAAAA=" alt="Daniel Lee" width="28" height="28">
           <div>
-            <div class="instructor-name">Lee Eccles</div>
-            <div class="instructor-role">Data Strategy Lead</div>
+            <div class="instructor-name">Daniel Lee</div>
+            <div class="instructor-role">Data &amp; Insights Manager</div>
           </div>
         </div>
         <a class="reserve-btn"
