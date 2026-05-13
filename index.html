@@ -268,16 +268,17 @@
       color: var(--text-2);
     }
 
-    .days-grid { display: flex; gap: 5px; }
+    .days-grid { display: flex; gap: 5px; flex: 1; }
 
     .day {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 4px;
+      justify-content: center;
+      padding: 8px 4px;
       border-radius: 8px;
-      gap: 3px;
+      gap: 4px;
     }
 
     .day.today { background: var(--blue); }
@@ -323,7 +324,6 @@
       background: var(--blue-50);
       border-radius: 8px;
       padding: 9px 12px;
-      margin-top: auto;
     }
 
     .banner-headline {
