@@ -395,7 +395,7 @@
       <!-- LEFT: NEXT UP -->
       <section class="p-next" aria-label="Next live session">
         <div class="next-badge">Next up</div>
-        <div class="next-time">Today &middot; 2:00 PM GMT</div>
+        <div class="next-time" id="next-time"></div>
         <h2 class="next-title">Bring Data to Life at Work</h2>
         <div class="instructor">
           <div class="av" style="background:#2563EB" aria-hidden="true">LE</div>
@@ -453,7 +453,7 @@
     /* ── Update session data here each week ─────────────
        sessions: counts for Mon → Fri
        total:    sum shown in the banner                  */
-    var WEEK = { sessions: [3, 4, 5, 3, 2], total: 17 };
+    var WEEK = { sessions: [3, 4, 5, 3, 2], total: 17, nextTime: '2:00 PM GMT' };
     /* ─────────────────────────────────────────────────── */
 
     (function () {
@@ -488,6 +488,11 @@
 
       document.getElementById('total-label').textContent =
         WEEK.total + ' live sessions this week';
+
+      var DAYS   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var label  = DAYS[today.getDay()] + ' ' + today.getDate() + ' ' + MONTHS[today.getMonth()];
+      document.getElementById('next-time').textContent = label + ' · ' + WEEK.nextTime;
     }());
   </script>
 
