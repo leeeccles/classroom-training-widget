@@ -70,7 +70,7 @@
       width: 42px;
       height: 42px;
       background: var(--blue);
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -118,7 +118,7 @@
     /* ── BODY ────────────────────────────────────────── */
     .w-body {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 11fr 9fr;
       flex: 1;
       min-height: 0;
     }
@@ -128,7 +128,7 @@
       padding: 14px 16px 14px 20px;
       display: flex;
       flex-direction: column;
-      gap: 9px;
+      gap: 8px;
       border-right: 1px solid var(--border);
       min-width: 0;
     }
@@ -152,7 +152,6 @@
       font-weight: 700;
       color: var(--text);
       line-height: 1.25;
-      letter-spacing: -0.2px;
     }
 
     .instructor {
@@ -240,7 +239,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--green);
     }
@@ -332,7 +331,7 @@
       gap: 6px;
       font-size: 12px;
       font-weight: 700;
-      color: var(--blue-h);
+      color: var(--text);
     }
 
     .banner-body {
@@ -340,6 +339,11 @@
       color: var(--text-2);
       margin-top: 3px;
       line-height: 1.4;
+    }
+
+    /* ── REDUCED MOTION ─────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .h-cta, .reserve-btn { transition: none; }
     }
 
     /* ── RESPONSIVE ──────────────────────────────────── */
@@ -417,7 +421,7 @@
           </div>
           <span class="attending-text">+24 attending</span>
           <span class="live-pill">
-            <span class="live-dot"></span>
+            <span class="live-dot" aria-hidden="true"></span>
             Live session
           </span>
         </div>
@@ -432,8 +436,8 @@
         <div class="week-banner">
           <div class="banner-headline">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="5.5" stroke="#1D4ED8" stroke-width="1.5"/>
-              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#1D4ED8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="7" cy="7" r="5.5" stroke="#374151" stroke-width="1.5"/>
+              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#374151" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span id="total-label">17 live sessions this week</span>
           </div>
