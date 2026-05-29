@@ -1,5 +1,5 @@
 const BASE = 'https://app.360learning.com/api/v2';
-const TOKEN_URL = process.env['360L_TOKEN_URL'] || 'https://app.360learning.com/oauth/token';
+const TOKEN_URL = process.env.LEARNING_TOKEN_URL || 'https://app.360learning.com/oauth/token';
 
 // In-memory token cache (lives for the duration of the function instance)
 let _token = null;
@@ -13,8 +13,8 @@ async function getToken() {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       grant_type: 'client_credentials',
-      client_id: process.env['360L_CLIENT_ID'],
-      client_secret: process.env['360L_CLIENT_SECRET'],
+      client_id: process.env.LEARNING_CLIENT_ID,
+      client_secret: process.env.LEARNING_CLIENT_SECRET,
       scope: 'classrooms:read',
     }),
   });
@@ -77,7 +77,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const token = await getToken();
-    const groupId = process.env['360L_GROUP_ID'];
+    const groupId = process.env.LEARNING_GROUP_ID;
 
     const qs = groupId ? `?groupId=${encodeURIComponent(groupId)}` : '';
     const raw = await apiFetch(token, `/classrooms${qs}`);
