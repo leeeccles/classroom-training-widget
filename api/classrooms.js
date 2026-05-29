@@ -45,8 +45,14 @@ async function apiFetch(token, path) {
       '360-api-version': 'v2.0',
     },
   });
-  if (!res.ok) throw new Error(`360L API ${path} → ${res.status}`);
-  return res.json();
+  const text = await res.text();
+  console.log(`[api] ${path} status=${res.status} body=${text.slice(0, 400)}`);
+  if (!res.ok) throw new Error(`360L API ${path} → ${res.status}: ${text.slice(0, 200)}`);
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    throw new Error(`360L API ${path} non-JSON (${res.status}): ${text.slice(0, 200)}`);
+  }
 }
 
 function getWeekBounds(now) {
