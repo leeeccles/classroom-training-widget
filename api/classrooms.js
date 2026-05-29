@@ -91,7 +91,7 @@ module.exports = async function handler(req, res) {
     const token = await getToken();
     const groupId = process.env.LEARNING_GROUP_ID;
 
-    const qs = groupId ? `?groupId=${encodeURIComponent(groupId)}` : '';
+    const qs = groupId ? `?groupId[eq]=${encodeURIComponent(groupId)}` : '';
     const raw = await apiFetch(token, `/classrooms${qs}`);
 
     // The API may return an array directly or wrap it in .data / .items
