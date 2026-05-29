@@ -18,19 +18,12 @@ async function getToken() {
     }),
   });
 
-  const rawBody = await res.text();
-  console.log(`[token] status=${res.status} url=${TOKEN_URL} body=${rawBody.slice(0, 300)}`);
-
   if (!res.ok) {
-    throw new Error(`Token request failed ${res.status}: ${rawBody.slice(0, 200)}`);
+    const body = await res.text();
+    throw new Error(`Token request failed ${res.status}: ${body.slice(0, 200)}`);
   }
 
-  let data;
-  try {
-    data = JSON.parse(rawBody);
-  } catch (e) {
-    throw new Error(`Token response not JSON (status ${res.status}): ${rawBody.slice(0, 200)}`);
-  }
+  const data = await res.json();
   _token = data.access_token;
   // Expire 60 s before the server says so
   _tokenExpiry = Date.now() + ((data.expires_in || 3600) - 60) * 1000;
@@ -44,14 +37,11 @@ async function apiFetch(token, path) {
       '360-api-version': 'v2.0',
     },
   });
-  const text = await res.text();
-  console.log(`[api] ${path} status=${res.status} body=${text.slice(0, 400)}`);
-  if (!res.ok) throw new Error(`360L API ${path} → ${res.status}: ${text.slice(0, 200)}`);
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    throw new Error(`360L API ${path} non-JSON (${res.status}): ${text.slice(0, 200)}`);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`360L API ${path} → ${res.status}: ${body.slice(0, 200)}`);
   }
+  return res.json();
 }
 
 function getWeekBounds(now) {
@@ -158,6 +148,6 @@ module.exports = async function handler(req, res) {
     res.json(payload);
   } catch (err) {
     console.error('[classrooms-api]', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to load classroom data' });
   }
 };
