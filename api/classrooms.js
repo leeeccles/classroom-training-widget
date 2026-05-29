@@ -1,5 +1,5 @@
 const BASE = 'https://app.360learning.com/api/v2';
-const TOKEN_URL = process.env.LEARNING_TOKEN_URL || 'https://app.360learning.com/oauth/token';
+const TOKEN_URL = process.env.LEARNING_TOKEN_URL || 'https://app.360learning.com/api/v2/oauth2/token';
 
 // In-memory token cache (lives for the duration of the function instance)
 let _token = null;
@@ -10,12 +10,11 @@ async function getToken() {
 
   const res = await fetch(TOKEN_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
+    headers: { 'Content-Type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({
       grant_type: 'client_credentials',
       client_id: process.env.LEARNING_CLIENT_ID,
       client_secret: process.env.LEARNING_CLIENT_SECRET,
-      scope: 'classrooms:read',
     }),
   });
 
