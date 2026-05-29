@@ -6,14 +6,14 @@
   <title>Live Learning Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: transparent;
       display: flex;
       flex-direction: column;
@@ -21,40 +21,41 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ── TOKENS ──────────────────────────────────────── */
     :root {
-      --blue:      #2563EB;
-      --blue-h:    #1D4ED8;
-      --blue-50:   #EFF6FF;
-      --blue-100:  #DBEAFE;
-      --text:      #111827;
-      --text-2:    #6B7280;
-      --text-3:    #4B5563;
-      --border:    #E5E7EB;
-      --white:     #FFFFFF;
-      --green:     #16A34A;
-      --green-dot: #22C55E;
+      --blue:       #2563EB;
+      --blue-h:     #1D4ED8;
+      --indigo:     #4F46E5;
+      --orange:     #F97316;
+      --orange-dk:  #EA580C;
+      --text:       #0F172A;
+      --text-2:     #64748B;
+      --text-3:     #94A3B8;
+      --border:     #E2E8F0;
+      --bg:         #F8FAFC;
+      --white:      #FFFFFF;
+      --green:      #059669;
+      --green-dot:  #34D399;
     }
 
-    /* ── WIDGET SHELL ────────────────────────────────── */
+    /* ── WIDGET SHELL ── */
     .widget {
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(37,99,235,0.09), 0 1px 3px rgba(0,0,0,0.05);
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* ── HEADER ──────────────────────────────────────── */
+    /* ── HEADER ── */
     .w-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 20px 12px;
-      border-bottom: 1px solid var(--border);
+      padding: 11px 18px;
+      background: linear-gradient(130deg, #1e3a8a 0%, #2563EB 50%, #4338ca 100%);
       gap: 12px;
       flex-shrink: 0;
     }
@@ -62,15 +63,16 @@
     .h-left {
       display: flex;
       align-items: center;
-      gap: 11px;
+      gap: 10px;
       min-width: 0;
     }
 
     .h-icon {
-      width: 42px;
-      height: 42px;
-      background: var(--blue);
-      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -78,44 +80,44 @@
     }
 
     .h-title {
-      font-size: 17px;
+      font-size: 14px;
       font-weight: 800;
-      color: var(--text);
+      color: #FFFFFF;
       letter-spacing: -0.3px;
       line-height: 1.2;
     }
 
     .h-sub {
-      font-size: 12px;
-      color: var(--text-2);
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.68);
       line-height: 1.4;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .h-cta {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: var(--blue);
-      color: var(--white);
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.28);
+      color: #FFFFFF;
       text-decoration: none;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 8px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
       border-radius: 8px;
       white-space: nowrap;
       flex-shrink: 0;
-      min-height: 44px;
-      transition: background 0.15s ease;
-      touch-action: manipulation;
+      min-height: 34px;
+      transition: background 0.15s ease, border-color 0.15s ease;
       cursor: pointer;
     }
 
-    .h-cta:hover        { background: var(--blue-h); }
-    .h-cta:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .h-cta:hover        { background: rgba(255,255,255,0.24); border-color: rgba(255,255,255,0.45); }
+    .h-cta:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }
 
-    /* ── BODY ────────────────────────────────────────── */
+    /* ── BODY ── */
     .w-body {
       display: grid;
       grid-template-columns: 11fr 9fr;
@@ -123,67 +125,79 @@
       min-height: 0;
     }
 
-    /* ── LEFT: NEXT UP ───────────────────────────────── */
+    /* ── LEFT: NEXT UP ── */
     .p-next {
-      padding: 14px 16px 14px 20px;
+      padding: 11px 14px 11px 16px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       border-right: 1px solid var(--border);
       min-width: 0;
+      background: var(--white);
     }
 
     .next-badge {
-      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9px;
       font-weight: 700;
-      color: var(--text-3);
-      letter-spacing: 0.06em;
+      color: var(--orange-dk);
+      letter-spacing: 0.07em;
       text-transform: uppercase;
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      border-radius: 20px;
+      padding: 2px 8px;
+      width: fit-content;
     }
 
     .next-time {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-2);
       font-weight: 500;
     }
 
     .next-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text);
       line-height: 1.25;
+      letter-spacing: -0.2px;
     }
 
     .instructor {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
 
     .av {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       color: var(--white);
       flex-shrink: 0;
+      background: linear-gradient(135deg, #6366f1 0%, #2563EB 100%);
+      box-shadow: 0 2px 6px rgba(99,102,241,0.4);
     }
 
     .av-photo { object-fit: cover; object-position: center top; }
 
     .instructor-name {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text);
       line-height: 1.2;
     }
 
     .instructor-role {
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--text-2);
       line-height: 1.3;
     }
@@ -192,22 +206,28 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      background: var(--blue);
+      gap: 5px;
+      background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
       color: var(--white);
       text-decoration: none;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11.5px;
       font-weight: 700;
-      padding: 10px 14px;
-      border-radius: 8px;
-      min-height: 44px;
-      transition: background 0.15s ease;
+      padding: 9px 14px;
+      border-radius: 10px;
+      min-height: 36px;
+      transition: box-shadow 0.2s ease, transform 0.15s ease;
       cursor: pointer;
+      box-shadow: 0 3px 10px rgba(37,99,235,0.32);
+      letter-spacing: 0.01em;
       touch-action: manipulation;
     }
 
-    .reserve-btn:hover        { background: var(--blue-h); }
+    .reserve-btn:hover {
+      box-shadow: 0 6px 18px rgba(37,99,235,0.42);
+      transform: translateY(-1px);
+    }
+    .reserve-btn:active  { transform: translateY(0); }
     .reserve-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
     .attending-row {
@@ -217,57 +237,61 @@
       margin-top: auto;
     }
 
-    .av-stack { display: flex; }
-
-    .av-stack .av {
-      width: 22px;
-      height: 22px;
-      font-size: 8px;
-      border: 2px solid var(--white);
-      margin-left: -6px;
-    }
-
-    .av-stack .av:first-child { margin-left: 0; }
-
     .attending-text {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-2);
       font-weight: 500;
-    }
-
-    .live-pill {
       display: flex;
       align-items: center;
       gap: 4px;
-      font-size: 11px;
+    }
+
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
       font-weight: 600;
       color: var(--green);
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: 20px;
+      padding: 2px 8px;
     }
 
     .live-dot {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       background: var(--green-dot);
       flex-shrink: 0;
+      animation: livePulse 2s ease-in-out infinite;
     }
 
-    /* ── RIGHT: THIS WEEK ────────────────────────────── */
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* ── RIGHT: THIS WEEK ── */
     .p-week {
-      padding: 14px 20px 14px 16px;
+      padding: 11px 16px 11px 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
+      background: var(--bg);
     }
 
     .week-label {
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 700;
-      color: var(--text-2);
+      color: var(--text-3);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
     }
 
-    .days-grid { display: flex; gap: 5px; flex: 1; }
+    .days-grid { display: flex; gap: 4px; flex: 1; }
 
     .day {
       flex: 1;
@@ -275,84 +299,94 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 8px 4px;
-      border-radius: 8px;
-      gap: 4px;
+      padding: 7px 3px;
+      border-radius: 10px;
+      gap: 3px;
+      background: var(--white);
+      border: 1px solid var(--border);
     }
 
-    .day.today { background: var(--blue); }
+    .day.today {
+      background: linear-gradient(155deg, #2563EB 0%, #4F46E5 100%);
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.32);
+    }
 
     .d-name {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 600;
       color: var(--text-3);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
 
-    .day.today .d-name { color: var(--white); }
+    .day.today .d-name { color: rgba(255,255,255,0.7); }
 
     .d-date {
       font-size: 13px;
       font-weight: 700;
       color: var(--text);
+      letter-spacing: -0.3px;
     }
 
     .day.today .d-date { color: var(--white); }
 
     .d-circle {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: #F3F4F6;
-      color: #374151;
-      font-size: 12px;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      background: #F1F5F9;
+      color: var(--text-2);
+      font-size: 10px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 0 5px;
     }
 
     .day.today .d-circle {
-      background: rgba(255,255,255,0.9);
-      color: var(--blue);
+      background: rgba(255,255,255,0.2);
+      color: var(--white);
     }
 
-
     .week-banner {
-      background: var(--blue-50);
-      border-radius: 8px;
-      padding: 9px 12px;
+      background: linear-gradient(135deg, #EFF6FF 0%, #EDE9FE 100%);
+      border: 1px solid #C7D2FE;
+      border-radius: 10px;
+      padding: 8px 11px;
     }
 
     .banner-headline {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12px;
+      gap: 5px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text);
     }
 
     .banner-body {
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--text-2);
-      margin-top: 3px;
+      margin-top: 2px;
       line-height: 1.4;
     }
 
-    /* ── REDUCED MOTION ─────────────────────────────── */
+    /* ── REDUCED MOTION ── */
     @media (prefers-reduced-motion: reduce) {
       .h-cta, .reserve-btn { transition: none; }
+      .reserve-btn:hover   { transform: none; }
+      .live-dot            { animation: none; }
     }
 
-    /* ── RESPONSIVE ──────────────────────────────────── */
+    /* ── RESPONSIVE ── */
     @media (max-width: 480px) {
       .w-body          { grid-template-columns: 1fr; }
       .p-next          { border-right: none; border-bottom: 1px solid var(--border); }
       .h-sub           { display: none; }
-      .w-header        { padding: 12px 16px 10px; }
-      .p-next, .p-week { padding: 12px 16px; }
+      .w-header        { padding: 10px 14px; }
+      .p-next, .p-week { padding: 10px 14px; }
     }
   </style>
 </head>
@@ -364,7 +398,7 @@
     <header class="w-header">
       <div class="h-left">
         <div class="h-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
             <rect x="2.5" y="4.5" width="17" height="15" rx="2.5" stroke="white" stroke-width="1.5"/>
             <path d="M2.5 9h17" stroke="white" stroke-width="1.5"/>
             <path d="M7 2.5v2M15 2.5v2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
@@ -374,7 +408,7 @@
         </div>
         <div>
           <div class="h-title">Live Learning Events</div>
-          <div class="h-sub">Join expert-led sessions, connect with peers and build skills in real time.</div>
+          <div class="h-sub">Expert-led sessions to level up your skills.</div>
         </div>
       </div>
       <a class="h-cta"
@@ -383,7 +417,7 @@
          rel="noopener noreferrer"
          aria-label="See full calendar of live learning events">
         See full calendar
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
           <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
@@ -394,11 +428,16 @@
 
       <!-- LEFT: NEXT UP -->
       <section class="p-next" aria-label="Next live session">
-        <div class="next-badge">Next up</div>
+        <div class="next-badge">
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
+            <circle cx="4" cy="4" r="3" fill="#EA580C"/>
+          </svg>
+          Next up
+        </div>
         <div class="next-time" id="next-time"></div>
         <h2 class="next-title" id="next-title">Loading…</h2>
         <div class="instructor" id="instructor-section" style="display:none">
-          <div id="instructor-avatar" class="av" style="background:#2563EB"></div>
+          <div id="instructor-avatar" class="av"></div>
           <div>
             <div class="instructor-name" id="instructor-name"></div>
             <div class="instructor-role" id="instructor-role"></div>
@@ -414,7 +453,12 @@
           </svg>
         </a>
         <div class="attending-row" id="attending-row" style="display:none">
-          <span class="attending-text" id="attending-text"></span>
+          <span class="attending-text" id="attending-text">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="5" r="3" stroke="#64748B" stroke-width="1.4"/>
+              <path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="#64748B" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </span>
           <span class="live-pill" id="live-pill" style="display:none">
             <span class="live-dot" aria-hidden="true"></span>
             Live now
@@ -424,19 +468,17 @@
 
       <!-- RIGHT: THIS WEEK -->
       <section class="p-week" aria-label="This week's live sessions">
-        <div class="week-label">This week at a glance</div>
-        <div class="days-grid" id="days-grid">
-          <!-- Populated by JS -->
-        </div>
+        <div class="week-label">This week</div>
+        <div class="days-grid" id="days-grid"></div>
         <div class="week-banner">
           <div class="banner-headline">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="5.5" stroke="#374151" stroke-width="1.5"/>
-              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#374151" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <circle cx="7" cy="7" r="5.5" stroke="#4F46E5" stroke-width="1.5"/>
+              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span id="total-label">17 live sessions this week</span>
+            <span id="total-label">Live sessions this week</span>
           </div>
-          <div class="banner-body">Choose what works for you. All times shown in your local timezone.</div>
+          <div class="banner-body">All times shown in your local timezone.</div>
         </div>
       </section>
 
@@ -445,12 +487,11 @@
   </article>
 
   <script>
-    var DAYS   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var DAYS      = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     var DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
-    // Palette for initials avatars (cycles by first char of name)
-    var AV_COLOURS = ['#2563EB','#7C3AED','#059669','#D97706','#DC2626','#0891B2'];
+    var AV_COLOURS = ['#6366f1','#2563EB','#0891B2','#059669','#D97706','#DC2626'];
 
     function avColour(name) {
       return AV_COLOURS[(name || '').charCodeAt(0) % AV_COLOURS.length];
@@ -474,18 +515,18 @@
     }
 
     function buildGrid(sessions) {
-      var today  = new Date();
-      var dow    = today.getDay();
-      var mon    = new Date(today);
+      var today = new Date();
+      var dow   = today.getDay();
+      var mon   = new Date(today);
       mon.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
-      var grid   = document.getElementById('days-grid');
+      var grid  = document.getElementById('days-grid');
       grid.innerHTML = '';
 
       DAY_NAMES.forEach(function (name, i) {
         var d = new Date(mon);
         d.setDate(mon.getDate() + i);
         var isToday = d.toDateString() === today.toDateString();
-        var count   = sessions[i] !== undefined ? sessions[i] : '-';
+        var count   = sessions[i] !== undefined ? sessions[i] : '–';
 
         var col = document.createElement('div');
         col.className = 'day' + (isToday ? ' today' : '');
@@ -505,7 +546,7 @@
 
       if (session.url) document.getElementById('reserve-btn').href = session.url;
 
-      // Trainer — only show section if we have real data
+      // Trainer — only show if real data exists
       if (session.trainer) {
         var t = session.trainer;
         document.getElementById('instructor-name').textContent = t.name || '';
@@ -516,47 +557,47 @@
         if (t.photoUrl) {
           var img = document.createElement('img');
           img.className = 'av av-photo';
-          img.src    = t.photoUrl;
-          img.alt    = t.name || '';
-          img.width  = 28;
-          img.height = 28;
+          img.src = t.photoUrl; img.alt = t.name || '';
+          img.width = 26; img.height = 26;
           avatarEl.parentNode.replaceChild(img, avatarEl);
         } else {
-          avatarEl.style.background = avColour(t.name);
+          avatarEl.style.background = 'linear-gradient(135deg, ' + avColour(t.name) + ', #2563EB)';
           avatarEl.textContent = initials(t.name);
         }
         document.getElementById('instructor-section').style.display = '';
       }
 
-      // Attendees + live pill — only show row if we have a count
+      // Attending count — only show if real data exists
       if (session.registrationsCount != null) {
-        document.getElementById('attending-text').textContent =
-          session.registrationsCount + ' registered';
+        var textEl = document.getElementById('attending-text');
+        // Keep the SVG icon, append count after it
+        textEl.innerHTML =
+          '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">' +
+          '<circle cx="8" cy="5" r="3" stroke="#64748B" stroke-width="1.4"/>' +
+          '<path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="#64748B" stroke-width="1.4" stroke-linecap="round"/>' +
+          '</svg>' +
+          ' ' + session.registrationsCount + ' registered';
         document.getElementById('attending-row').style.display = '';
       }
 
-      // "Live now" pill — only show if session is happening right now
+      // "Live now" pill — only during session window
       if (session.endDate) {
         var now = new Date();
-        var start = new Date(session.date);
-        var end   = new Date(session.endDate);
-        if (now >= start && now <= end) {
+        if (now >= new Date(session.date) && now <= new Date(session.endDate)) {
           document.getElementById('live-pill').style.display = '';
         }
       }
     }
 
-    // Render week grid immediately with placeholder dashes
-    buildGrid(['-','-','-','-','-']);
-
-    // Set today's date in the next-time field as a placeholder
+    // Render placeholders immediately
+    buildGrid(['–','–','–','–','–']);
     (function () {
       var today = new Date();
       document.getElementById('next-time').textContent =
         DAYS[today.getDay()] + ' ' + today.getDate() + ' ' + MONTHS[today.getMonth()];
     }());
 
-    // Fetch live data and update the widget
+    // Fetch live data and update
     fetch('/api/classrooms')
       .then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
