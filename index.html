@@ -6,12 +6,10 @@
   <title>Live Learning Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: auto; }
-
-    /* Body is fully transparent — the page behind the iframe shows through */
     body {
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       background: transparent;
@@ -19,14 +17,52 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
+    /* ── TOKENS ── */
+    :root {
+      /* Type scale: 9 11 12 13 14 18 20 22 (modular, no arbitrary sizes) */
+      --text-xs:   9px;
+      --text-sm:   11px;
+      --text-base: 13px;
+      --text-md:   14px;
+      --text-lg:   18px;
+      --text-xl:   20px;
+      --text-2xl:  22px;
+
+      /* Spacing: strict 4/8px rhythm */
+      --sp-1:  4px;
+      --sp-2:  8px;
+      --sp-3:  12px;
+      --sp-4:  16px;
+      --sp-5:  20px;
+      --sp-6:  24px;
+
+      /* Ink — all pass 4.5:1 on glass bg (effective ~L 0.88) */
+      --ink:   oklch(0.18 0.016 268);   /* 10:1+ */
+      --ink-2: oklch(0.42 0.012 268);   /* 4.8:1 */
+      --ink-3: oklch(0.54 0.008 268);   /* 4.5:1 exactly */
+
+      /* Glass internals */
+      --glass-divide:  rgba(0,0,0,0.07);
+      --glass-border:  rgba(210,218,225,0.80);
+      --glass-inner:   rgba(255,255,255,0.22);
+
+      /* Accent */
+      --accent:    oklch(0.50 0.22 294);
+      --accent-dk: oklch(0.40 0.22 294);
+      --accent-lt: oklch(0.94 0.06 294);
+
+      /* Radius */
+      --r-widget: 20px;
+      --r-card:   12px;
+      --r-btn:    10px;
+    }
+
     /* ──────────────────────────────────────────
-       OUTER WRAPPER — houses the BorderBeam
-       as a sibling so it isn't clipped by the
-       widget's overflow:hidden
+       OUTER WRAPPER + SHINE BORDER
     ────────────────────────────────────────── */
     .widget-outer {
       position: relative;
-      border-radius: 20px;
+      border-radius: var(--r-widget);
       animation: widgetIn 0.35s ease-out both;
     }
     @keyframes widgetIn {
@@ -34,39 +70,24 @@
       to   { opacity: 1; }
     }
 
-    /* ──────────────────────────────────────────
-       SHINE BORDER
-       Port of the ShineBorder component.
-       A radial gradient sweeps across the border
-       via background-position animation. The mask
-       clips visibility to the 1.5px padding strip
-       (content-box vs border-box = exclude).
-       No offset-path needed — wider browser support.
-    ────────────────────────────────────────── */
     .shine-border {
       pointer-events: none;
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      /* padding defines the border-strip width */
       padding: 1.5px;
       z-index: 10;
       will-change: background-position;
-
-      /* Radial gradient — cool periwinkle → soft violet, sympathetic to glass */
       background-image: radial-gradient(
         transparent, transparent,
         #a5b8f0, #9c40ff,
         transparent, transparent
       );
       background-size: 300% 300%;
-
-      /* Reveal only the strip between content-box and border-box */
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask-composite: exclude;
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
-
       animation: shineBorder 14s linear infinite;
     }
     @keyframes shineBorder {
@@ -76,38 +97,46 @@
 
     /* ──────────────────────────────────────────
        GLASS WIDGET
-       Cool blue-gray tint makes glass readable
-       even on a white page. Real glass has a
-       slight blue cast — this mirrors that.
-       Inner top highlight = light on glass edge.
-       Colored shadow = glass refracting light.
     ────────────────────────────────────────── */
     .widget {
-      /* Glass tint: #E4E9ED */
       background: rgba(228,233,237,0.62);
       backdrop-filter: blur(32px) saturate(2.0) brightness(1.02);
       -webkit-backdrop-filter: blur(32px) saturate(2.0) brightness(1.02);
-      border-radius: 20px;
+      border-radius: var(--r-widget);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      border: 1px solid rgba(210,218,225,0.80);
+      border: 1px solid var(--glass-border);
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.88),
         inset 1px 0 0 rgba(255,255,255,0.30),
         inset 0 -1px 0 rgba(100,110,120,0.06);
     }
 
-    /* ── PALETTE ── */
-    :root {
-      --ink:      oklch(0.20 0.014 268);
-      --ink-2:    oklch(0.46 0.010 268);
-      --ink-3:    oklch(0.64 0.007 268);
-      --divide:   rgba(0,0,0,0.07);
-      --accent:   oklch(0.50 0.22 294);
-      --accent-dk:oklch(0.40 0.22 294);
-      --accent-lt:oklch(0.94 0.05 294);
+    /* ──────────────────────────────────────────
+       SKELETON SHIMMER
+       Used while API data is in-flight.
+    ────────────────────────────────────────── */
+    @keyframes shimmer {
+      from { background-position: 200% center; }
+      to   { background-position: -200% center; }
     }
+    .skeleton {
+      display: block;
+      border-radius: 6px;
+      background: linear-gradient(
+        90deg,
+        rgba(0,0,0,0.04) 25%,
+        rgba(0,0,0,0.09) 50%,
+        rgba(0,0,0,0.04) 75%
+      );
+      background-size: 400% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      color: transparent !important;
+      user-select: none;
+      pointer-events: none;
+    }
+    .skeleton::after { content: '\00a0'; }
 
     /* ──────────────────────────────────────────
        HEADER
@@ -115,14 +144,13 @@
     .w-header {
       display: flex;
       align-items: center;
-      padding: 13px 20px;
-      gap: 12px;
-      background: rgba(255,255,255,0.22);
-      border-bottom: 1px solid rgba(210,218,225,0.55);
+      padding: 14px var(--sp-5);
+      gap: var(--sp-3);
+      background: var(--glass-inner);
+      border-bottom: 1px solid rgba(210,218,225,0.50);
       flex-shrink: 0;
     }
-
-    .h-left { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+    .h-left { display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0; }
     .h-icon {
       width: 36px; height: 36px;
       background: rgba(255,255,255,0.50);
@@ -131,15 +159,23 @@
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-    .h-title { font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; line-height: 1; }
-    .h-sub   { display: none; }
+    .h-title {
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+      line-height: 1;
+    }
 
-    /* ── week day circles ── */
-    .h-week { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+    /* Week circles */
+    .h-week { display: flex; align-items: center; gap: var(--sp-1); margin-left: auto; }
     .h-day  { display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .h-day-name {
-      font-size: 8px; font-weight: 700; color: var(--ink-3);
-      text-transform: uppercase; letter-spacing: 0.07em;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--ink-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
     .h-day-circle {
       width: 30px; height: 30px; border-radius: 50%;
@@ -147,112 +183,150 @@
       font-size: 12px; font-weight: 700; color: var(--ink-2);
       background: rgba(255,255,255,0.55);
       border: 1px solid rgba(210,218,225,0.70);
-      transition: background 0.15s;
+      transition: background 0.15s ease;
     }
-    /* today: violet — matches the accent, like "19" in the reference calendar */
     .h-day.today .h-day-circle {
       background: var(--accent);
       color: #fff;
       border-color: transparent;
-      box-shadow: none;
       font-weight: 800;
     }
     .h-day.has-sessions .h-day-circle {
       color: var(--ink);
-      background: rgba(255,255,255,0.55);
-      border-color: rgba(255,255,255,0.65);
+      background: rgba(255,255,255,0.70);
+      border-color: rgba(210,218,225,0.80);
     }
 
-    /* session count */
+    /* Session count */
     .h-count {
       display: flex; flex-direction: column; align-items: center;
-      padding-left: 12px; margin-left: 4px;
-      border-left: 1px solid var(--divide);
+      padding-left: var(--sp-3); margin-left: var(--sp-1);
+      border-left: 1px solid var(--glass-divide);
     }
-    .h-count-num { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1; }
-    .h-count-lbl { font-size: 9px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; margin-top: 1px; }
+    .h-count-num {
+      font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1;
+    }
+    .h-count-lbl {
+      font-size: var(--text-xs); font-weight: 700; color: var(--ink-3);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      white-space: nowrap; margin-top: 2px;
+    }
 
-    /* CTA — frosted glass pill */
+    /* CTA */
     .h-cta {
-      display: inline-flex; align-items: center; gap: 5px;
+      display: inline-flex; align-items: center; gap: var(--sp-1);
       background: rgba(255,255,255,0.62);
-      border: 1px solid rgba(210,218,225,0.80);
+      border: 1px solid var(--glass-border);
       color: var(--ink);
       text-decoration: none;
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 12px; font-weight: 700;
-      padding: 7px 14px; border-radius: 10px;
-      white-space: nowrap; flex-shrink: 0; min-height: 32px;
-      transition: background 0.15s, border-color 0.15s;
+      padding: 0 var(--sp-3);
+      border-radius: var(--r-btn);
+      white-space: nowrap; flex-shrink: 0;
+      /* Touch target: 44px tall */
+      min-height: 44px;
+      transition: background 0.15s ease, border-color 0.15s ease;
       cursor: pointer;
     }
-    .h-cta:hover { background: rgba(255,255,255,0.65); border-color: rgba(255,255,255,0.80); }
+    .h-cta:hover { background: rgba(255,255,255,0.82); }
     .h-cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
     /* ──────────────────────────────────────────
        BODY
     ────────────────────────────────────────── */
     .w-body { display: grid; grid-template-columns: 1fr 1fr; }
+    /* Collapse to single col when no right-panel content */
+    .w-body.full-width { grid-template-columns: 1fr; }
 
     /* ── LEFT: SESSION ── */
     .p-session {
-      padding: 18px 18px 18px 20px;
-      display: flex; flex-direction: column; justify-content: center; gap: 9px;
-      border-right: 1px solid rgba(210,218,225,0.55);
+      padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-5);
+      display: flex; flex-direction: column; justify-content: center;
+      gap: var(--sp-2);
+      border-right: 1px solid rgba(210,218,225,0.50);
       min-width: 0;
     }
+    .w-body.full-width .p-session { border-right: none; }
 
+    /* Session label: dot + regular-case text (no all-caps eyebrow) */
     .session-label {
-      display: flex; align-items: center; gap: 7px;
-      font-size: 10px; font-weight: 700; color: var(--ink-3);
-      text-transform: uppercase; letter-spacing: 0.10em;
+      display: flex; align-items: center; gap: 6px;
+      font-size: var(--text-sm); font-weight: 600; color: var(--ink-3);
+      line-height: 1;
     }
-    .session-label-line {
-      flex: 1; height: 1px; background: var(--divide); max-width: 22px;
+    .session-label-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
     }
-    .next-time { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+
+    .next-time {
+      font-size: var(--text-base); font-weight: 600; color: var(--ink-2);
+      line-height: 1.4;
+      min-height: 1.2em; /* stable skeleton height */
+    }
+
+    /* Session title is the HERO — larger than widget heading */
     .next-title {
-      font-size: 20px; font-weight: 800; color: var(--ink);
-      line-height: 1.15; letter-spacing: -0.4px;
+      font-size: var(--text-2xl); font-weight: 800; color: var(--ink);
+      line-height: 1.2; letter-spacing: -0.4px;
       text-wrap: balance;
-      animation: titleIn 0.5s 0.10s cubic-bezier(0.16,1,0.3,1) both;
+      min-height: 1.2em; /* stable skeleton height */
     }
-    @keyframes titleIn {
-      from { opacity: 0; transform: translateY(-4px); }
+    /* Skeleton: explicit sizing so shimmer dims an identifiable shape */
+    .next-title.skeleton  { width: 80%; height: 26px; }
+    .next-time.skeleton   { width: 44%; height: 16px; }
+
+    /* After data loads, fade in from below */
+    .next-title.loaded {
+      animation: contentIn 0.35s 0s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes contentIn {
+      from { opacity: 0; transform: translateY(-3px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* reserve — violet, high contrast */
+    /* Reserve button */
     .reserve-btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px;
       background: var(--accent);
       color: #fff;
       text-decoration: none;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 13px; font-weight: 800;
-      padding: 10px 18px; border-radius: 11px; min-height: 38px; width: fit-content;
-      box-shadow: none;
-      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
-      cursor: pointer; letter-spacing: 0.01em; touch-action: manipulation;
+      font-size: var(--text-base); font-weight: 800;
+      padding: 0 var(--sp-4);
+      border-radius: var(--r-btn);
+      /* Touch target: 44px */
+      min-height: 44px;
+      width: fit-content;
+      transition: background 0.15s ease, transform 0.12s ease;
+      cursor: pointer; touch-action: manipulation;
+      border: none;
     }
-    .reserve-btn:hover {
-      background: var(--accent-dk);
-      box-shadow: none;
-      transform: translateY(-1px);
-    }
+    .reserve-btn:hover  { background: var(--accent-dk); transform: translateY(-1px); }
     .reserve-btn:active { transform: translateY(0); }
     .reserve-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-    .attending-row { display: flex; align-items: center; gap: 8px; }
+    /* No-sessions variant: muted ghost style via class, not inline styles */
+    .reserve-btn.is-empty {
+      background: rgba(0,0,0,0.08);
+      color: var(--ink-2);
+      border: 1px solid rgba(0,0,0,0.10);
+    }
+    .reserve-btn.is-empty:hover { background: rgba(0,0,0,0.13); transform: none; }
+
+    .attending-row { display: flex; align-items: center; gap: var(--sp-2); }
     .attending-text {
       font-size: 12px; color: var(--ink-2); font-weight: 600;
-      display: flex; align-items: center; gap: 4px;
+      display: flex; align-items: center; gap: var(--sp-1);
+      line-height: 1.4;
     }
     .live-pill {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: 10px; font-weight: 700; color: var(--accent);
+      display: inline-flex; align-items: center; gap: var(--sp-1);
+      font-size: 11px; font-weight: 700; color: var(--accent);
       background: var(--accent-lt);
-      border-radius: 20px; padding: 2px 8px;
+      border-radius: 20px; padding: 3px 10px;
     }
     .live-dot {
       width: 5px; height: 5px; border-radius: 50%;
@@ -264,95 +338,114 @@
       50%       { opacity: 0.38; transform: scale(0.72); }
     }
 
-    /* ── RIGHT: INSTRUCTOR ── */
+    /* ── RIGHT: INSTRUCTOR / CONTEXT ── */
     .p-right {
-      padding: 18px 20px 18px 18px;
-      display: flex; flex-direction: column; justify-content: center; gap: 12px;
+      padding: var(--sp-4) var(--sp-5) var(--sp-4) var(--sp-4);
+      display: flex; flex-direction: column; justify-content: center;
+      gap: var(--sp-3);
       background: rgba(255,255,255,0.14);
       min-width: 0;
     }
 
-    /* frosted inner card — more opaque for depth contrast */
+    /* Frosted instructor card */
     .instructor-card {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 13px;
+      display: flex; align-items: center; gap: var(--sp-3);
+      padding: var(--sp-3);
       background: rgba(255,255,255,0.68);
-      border: 1px solid rgba(210,218,225,0.80);
+      border: 1px solid var(--glass-border);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.90);
-      border-radius: 13px;
+      border-radius: var(--r-card);
     }
     .av {
-      width: 38px; height: 38px; border-radius: 50%;
+      width: 40px; height: 40px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 800; color: #fff;
+      font-size: 14px; font-weight: 800; color: #fff;
       flex-shrink: 0; background: var(--accent);
     }
     .av-photo { object-fit: cover; object-position: center top; }
     .instructor-info { min-width: 0; }
     .instructor-label {
-      font-size: 9px; font-weight: 700; color: var(--ink-3);
-      text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 3px;
+      font-size: var(--text-xs); font-weight: 700; color: var(--ink-3);
+      text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: var(--sp-1);
+      line-height: 1;
     }
     .instructor-name {
-      font-size: 14px; font-weight: 800; color: var(--ink);
+      font-size: var(--text-md); font-weight: 800; color: var(--ink);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
     }
     .instructor-role {
-      font-size: 11px; color: var(--ink-2); font-weight: 600; line-height: 1.3;
+      font-size: var(--text-sm); color: var(--ink-2); font-weight: 600;
+      line-height: 1.4;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+
+    /* Shown when no session / no instructor */
+    .context-panel {
+      display: flex; flex-direction: column; gap: var(--sp-2);
+    }
+    .context-text {
+      font-size: var(--text-sm); color: var(--ink-2); font-weight: 500;
+      line-height: 1.55;
+    }
+    .context-link {
+      font-size: var(--text-sm); font-weight: 700; color: var(--accent);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .context-link:hover { color: var(--accent-dk); }
+    .context-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
     .session-tz {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; color: var(--ink-3); font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+      font-size: var(--text-sm); color: var(--ink-3); font-weight: 500;
+      line-height: 1.4;
     }
 
     /* ── REDUCED MOTION ── */
     @media (prefers-reduced-motion: reduce) {
-      .widget-outer  { animation: none; }
-      .next-title    { animation: none; }
-      .shine-border  { animation: none; }
-      .reserve-btn   { transition: none; }
-      .reserve-btn:hover { transform: none; }
-      .live-dot      { animation: none; }
+      .widget-outer       { animation: none; }
+      .next-title.loaded  { animation: none; }
+      .shine-border       { animation: none; }
+      .skeleton           { animation: none; }
+      .reserve-btn        { transition: none; }
+      .reserve-btn:hover  { transform: none; }
+      .live-dot           { animation: none; }
     }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 520px) {
-      .w-body { grid-template-columns: 1fr; }
-      .p-session { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.38); }
+      .w-body,
+      .w-body.full-width { grid-template-columns: 1fr; }
+      .p-session { border-right: none; border-bottom: 1px solid rgba(210,218,225,0.50); }
       .h-week, .h-count { display: none; }
-      .h-sub { display: none; }
-      .w-header { padding: 12px 14px; }
-      .p-session, .p-right { padding: 14px; }
+      .w-header { padding: var(--sp-3) var(--sp-4); }
+      .p-session, .p-right { padding: var(--sp-3) var(--sp-4); }
     }
   </style>
 </head>
 <body>
   <div class="widget-outer">
 
-    <!-- ShineBorder: amber→violet radial gradient sweeps the border -->
     <div class="shine-border" aria-hidden="true"></div>
 
     <article class="widget" role="region" aria-label="Live Learning Events">
 
+      <!-- HEADER -->
       <header class="w-header">
         <div class="h-left">
           <div class="h-icon" aria-hidden="true">
             <svg width="19" height="19" viewBox="0 0 22 22" fill="none">
-              <rect x="2.5" y="4.5" width="17" height="15" rx="2.5" stroke="oklch(0.22 0.014 268)" stroke-width="1.6"/>
-              <path d="M2.5 9h17" stroke="oklch(0.22 0.014 268)" stroke-width="1.6"/>
-              <path d="M7 2.5v2M15 2.5v2" stroke="oklch(0.22 0.014 268)" stroke-width="1.6" stroke-linecap="round"/>
-              <rect x="6.5" y="12" width="3" height="2.5" rx="0.5" fill="oklch(0.22 0.014 268)"/>
-              <rect x="12.5" y="12" width="3" height="2.5" rx="0.5" fill="oklch(0.22 0.014 268)"/>
+              <rect x="2.5" y="4.5" width="17" height="15" rx="2.5" stroke="oklch(0.18 0.016 268)" stroke-width="1.6"/>
+              <path d="M2.5 9h17" stroke="oklch(0.18 0.016 268)" stroke-width="1.6"/>
+              <path d="M7 2.5v2M15 2.5v2" stroke="oklch(0.18 0.016 268)" stroke-width="1.6" stroke-linecap="round"/>
+              <rect x="6.5" y="12" width="3" height="2.5" rx="0.5" fill="oklch(0.18 0.016 268)"/>
+              <rect x="12.5" y="12" width="3" height="2.5" rx="0.5" fill="oklch(0.18 0.016 268)"/>
             </svg>
           </div>
-          <div>
-            <div class="h-title">Live Learning Events</div>
-            <div class="h-sub">Expert-led sessions to level up your skills.</div>
-          </div>
+          <div class="h-title">Live Learning Events</div>
         </div>
 
         <div class="h-week" id="h-week-strip" aria-label="This week"></div>
+
         <div class="h-count">
           <span class="h-count-num" id="total-num">–</span>
           <span class="h-count-lbl" id="total-label">this week</span>
@@ -369,38 +462,38 @@
         </a>
       </header>
 
-      <div class="w-body">
+      <!-- BODY -->
+      <div class="w-body" id="w-body">
 
         <section class="p-session" aria-label="Next live session">
-          <div class="session-label">
-            <span>Next up</span>
-            <div class="session-label-line" aria-hidden="true"></div>
+          <!-- Dot + regular-case label (replaces all-caps NEXT UP eyebrow) -->
+          <div class="session-label" id="session-label">
+            <span class="session-label-dot" aria-hidden="true"></span>
+            <span id="session-label-text">Next session</span>
           </div>
-          <div class="next-time" id="next-time"></div>
-          <h2 class="next-title" id="next-title">Loading…</h2>
+          <!-- Both start as skeleton shapes -->
+          <div class="next-time skeleton" id="next-time" aria-live="polite"></div>
+          <h2 class="next-title skeleton" id="next-title" aria-live="polite"></h2>
           <a class="reserve-btn" id="reserve-btn"
              href="https://app.360learning.com/home/content/classrooms"
-             target="_blank" rel="noopener noreferrer">
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Reserve your spot at this live session">
             Reserve my spot
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
               <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </a>
           <div class="attending-row" id="attending-row" style="display:none">
-            <span class="attending-text" id="attending-text">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
-                <path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <span class="live-pill" id="live-pill" style="display:none">
+            <span class="attending-text" id="attending-text"></span>
+            <span class="live-pill" id="live-pill" style="display:none" aria-label="Session is live now">
               <span class="live-dot" aria-hidden="true"></span>
               Live now
             </span>
           </div>
         </section>
 
-        <section class="p-right" aria-label="Session instructor">
+        <section class="p-right" id="p-right" aria-label="Session details">
+          <!-- Instructor card — hidden until trainer data arrives -->
           <div class="instructor-card" id="instructor-section" style="display:none">
             <div class="av" id="instructor-avatar" aria-hidden="true"></div>
             <div class="instructor-info">
@@ -409,12 +502,28 @@
               <div class="instructor-role" id="instructor-role"></div>
             </div>
           </div>
+
+          <!-- Context panel — shown when no instructor data -->
+          <div class="context-panel" id="context-panel">
+            <p class="context-text" id="context-text">
+              Expert-led sessions added each week.
+            </p>
+            <a class="context-link"
+               href="https://app.360learning.com/home/content/classrooms"
+               target="_blank" rel="noopener noreferrer">
+              Browse all sessions
+              <svg width="11" height="11" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </div>
+
           <div class="session-tz">
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
               <path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            All times shown in your local timezone.
+            Your local timezone
           </div>
         </section>
 
@@ -430,6 +539,7 @@
       'oklch(0.50 0.22 294)','oklch(0.44 0.14 188)','oklch(0.46 0.16 252)',
       'oklch(0.48 0.16 148)','oklch(0.52 0.16 60)', 'oklch(0.46 0.18 22)',
     ];
+
     function avColor(n) { return AV_COLORS[(n||'').charCodeAt(0) % AV_COLORS.length]; }
     function initials(n) {
       var p = (n||'').trim().split(/\s+/);
@@ -441,74 +551,107 @@
       var mm = m ? ':'+String(m).padStart(2,'0') : '';
       return DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' · '+h12+mm+' '+ap;
     }
+
+    function removeSkeleton(el) {
+      el.classList.remove('skeleton');
+      el.classList.add('loaded');
+    }
+
     function buildHeaderGrid(sessions) {
       var today = new Date(), dow = today.getDay();
-      var mon = new Date(today); mon.setDate(today.getDate() + (dow===0 ? -6 : 1-dow));
-      var strip = document.getElementById('h-week-strip'); strip.innerHTML = '';
+      var mon   = new Date(today);
+      mon.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
+      var strip = document.getElementById('h-week-strip');
+      strip.innerHTML = '';
       DAY_NAMES.forEach(function(name, i) {
-        var d = new Date(mon); d.setDate(mon.getDate()+i);
+        var d = new Date(mon);
+        d.setDate(mon.getDate() + i);
         var isToday = d.toDateString() === today.toDateString();
         var count   = sessions[i] !== undefined ? sessions[i] : 0;
         var hasSess = typeof count === 'number' && count > 0;
         var col = document.createElement('div');
         col.className = 'h-day'+(isToday?' today':'')+(hasSess?' has-sessions':'');
         col.setAttribute('aria-label', name+' '+d.getDate()+', '+count+' session'+(count!==1?'s':'')+(isToday?' — today':''));
-        col.innerHTML = '<span class="h-day-name">'+name.charAt(0)+'</span><div class="h-day-circle">'+d.getDate()+'</div>';
+        col.innerHTML =
+          '<span class="h-day-name">'+name.charAt(0)+'</span>'+
+          '<div class="h-day-circle">'+d.getDate()+'</div>';
         strip.appendChild(col);
       });
     }
+
     function setNoSessions() {
-      document.getElementById('next-time').textContent = '';
-      document.getElementById('next-title').textContent = 'More sessions coming soon';
-      var btn = document.getElementById('reserve-btn');
-      btn.textContent = 'Browse the catalogue';
-      btn.style.background = 'rgba(0,0,0,0.15)';
-      btn.style.color = 'oklch(0.46 0.010 268)';
-      btn.style.boxShadow = 'none';
-      btn.style.border = '1px solid rgba(0,0,0,0.10)';
+      var titleEl = document.getElementById('next-title');
+      var timeEl  = document.getElementById('next-time');
+      var btn     = document.getElementById('reserve-btn');
+      var labelEl = document.getElementById('session-label-text');
+      var ctxEl   = document.getElementById('context-text');
+
+      removeSkeleton(titleEl);
+      removeSkeleton(timeEl);
+
+      titleEl.textContent = 'More sessions coming soon';
+      timeEl.textContent  = '';
+      labelEl.textContent = 'Up next';
+      ctxEl.textContent   = 'New sessions are added every week.';
+
+      btn.style.display = 'none';
     }
+
     function applyNextSession(s) {
-      document.getElementById('next-title').textContent = s.name;
-      document.getElementById('next-time').textContent  = formatDate(s.date);
+      var titleEl = document.getElementById('next-title');
+      var timeEl  = document.getElementById('next-time');
+
+      removeSkeleton(titleEl);
+      removeSkeleton(timeEl);
+
+      titleEl.textContent = s.name;
+      timeEl.textContent  = formatDate(s.date);
+
       if (s.url) document.getElementById('reserve-btn').href = s.url;
+
       if (s.trainer) {
         var t = s.trainer;
+        document.getElementById('context-panel').style.display = 'none';
         document.getElementById('instructor-section').style.display = '';
         document.getElementById('instructor-name').textContent = t.name || '';
         document.getElementById('instructor-role').textContent = t.role || '';
         document.getElementById('instructor-role').style.display = t.role ? '' : 'none';
+
         var el = document.getElementById('instructor-avatar');
         if (t.photoUrl) {
           var img = document.createElement('img');
-          img.className = 'av av-photo'; img.src = t.photoUrl; img.alt = t.name||'';
-          img.width = 38; img.height = 38;
+          img.className = 'av av-photo'; img.src = t.photoUrl; img.alt = t.name || '';
+          img.width = 40; img.height = 40;
           el.parentNode.replaceChild(img, el);
         } else {
           el.style.background = avColor(t.name);
           el.textContent = initials(t.name);
         }
       }
+
       if (s.registrationsCount != null) {
         var te = document.getElementById('attending-text');
         te.innerHTML =
           '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">'+
           '<circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>'+
           '<path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>'+
-          '</svg> '+s.registrationsCount+' registered';
+          '</svg> '+s.registrationsCount+' registered';
         document.getElementById('attending-row').style.display = '';
       }
+
       if (s.endDate) {
         var now = new Date();
-        if (now >= new Date(s.date) && now <= new Date(s.endDate))
+        if (now >= new Date(s.date) && now <= new Date(s.endDate)) {
           document.getElementById('live-pill').style.display = '';
+          document.getElementById('session-label-text').textContent = 'Live now';
+          document.querySelector('.session-label-dot').style.background = 'oklch(0.50 0.17 148)';
+        }
       }
     }
+
+    /* Initial state: skeletons, no placeholder text */
     buildHeaderGrid([0,0,0,0,0]);
-    (function() {
-      var t = new Date();
-      document.getElementById('next-time').textContent =
-        DAYS[t.getDay()]+' '+t.getDate()+' '+MONTHS[t.getMonth()];
-    }());
+
     fetch('/api/classrooms')
       .then(function(r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
       .then(function(data) {
