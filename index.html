@@ -35,43 +35,43 @@
     }
 
     /* ──────────────────────────────────────────
-       BORDER BEAM
-       Pure CSS port of the BorderBeam component.
-       A gradient spot travels around the border
-       via CSS Motion Path (offset-path).
+       SHINE BORDER
+       Port of the ShineBorder component.
+       A radial gradient sweeps across the border
+       via background-position animation. The mask
+       clips visibility to the 1.5px padding strip
+       (content-box vs border-box = exclude).
+       No offset-path needed — wider browser support.
     ────────────────────────────────────────── */
-    .border-beam {
+    .shine-border {
       pointer-events: none;
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      border: 1.5px solid transparent;
+      /* padding defines the border-strip width */
+      padding: 1.5px;
       z-index: 10;
+      will-change: background-position;
 
-      /* Reveal only the border strip (border-box minus padding-box) */
-      mask:
-        linear-gradient(#fff 0 0) padding-box,
-        linear-gradient(#fff 0 0) border-box;
+      /* Radial gradient colour stops — amber centre → violet edge */
+      background-image: radial-gradient(
+        transparent, transparent,
+        #ffaa40, #9c40ff,
+        transparent, transparent
+      );
+      background-size: 300% 300%;
+
+      /* Reveal only the strip between content-box and border-box */
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask-composite: exclude;
-      -webkit-mask:
-        linear-gradient(#fff 0 0) padding-box,
-        linear-gradient(#fff 0 0) border-box;
-      -webkit-mask-composite: destination-out;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+
+      animation: shineBorder 14s linear infinite;
     }
-    .border-beam::after {
-      content: '';
-      position: absolute;
-      aspect-ratio: 1;
-      width: 200px;
-      background: linear-gradient(to left, #ffaa40, #9c40ff, transparent);
-      /* Travel around the element's border rectangle */
-      offset-path: rect(0 auto auto 0 round 200px);
-      offset-anchor: 90% 50%;
-      animation: borderBeam 15s linear infinite;
-    }
-    @keyframes borderBeam {
-      from { offset-distance: 0%; }
-      to   { offset-distance: 100%; }
+    @keyframes shineBorder {
+      from { background-position: 0% 0%; }
+      to   { background-position: -200% 0%; }
     }
 
     /* ──────────────────────────────────────────
@@ -313,12 +313,12 @@
 
     /* ── REDUCED MOTION ── */
     @media (prefers-reduced-motion: reduce) {
-      .widget-outer { animation: none; }
-      .next-title   { animation: none; }
-      .border-beam::after { animation: none; }
-      .reserve-btn  { transition: none; }
+      .widget-outer  { animation: none; }
+      .next-title    { animation: none; }
+      .shine-border  { animation: none; }
+      .reserve-btn   { transition: none; }
       .reserve-btn:hover { transform: none; }
-      .live-dot     { animation: none; }
+      .live-dot      { animation: none; }
     }
 
     /* ── RESPONSIVE ── */
@@ -335,8 +335,8 @@
 <body>
   <div class="widget-outer">
 
-    <!-- BorderBeam: amber→violet spot travels the border -->
-    <div class="border-beam" aria-hidden="true"></div>
+    <!-- ShineBorder: amber→violet radial gradient sweeps the border -->
+    <div class="shine-border" aria-hidden="true"></div>
 
     <article class="widget" role="region" aria-label="Live Learning Events">
 
