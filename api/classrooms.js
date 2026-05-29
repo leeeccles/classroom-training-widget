@@ -142,6 +142,7 @@ module.exports = async function handler(req, res) {
         url: `https://app.360learning.com/home/content/classrooms/${classroomId}`,
         trainer: parseTrainer(nextSlot),
         registrationsCount: nextSlot.registrationsCount ?? nextSlot.attendees ?? nextSlot.registrations ?? null,
+        _rawSlot: nextSlot,
       };
     }
 
