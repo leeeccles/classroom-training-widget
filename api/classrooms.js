@@ -159,6 +159,6 @@ module.exports = async function handler(req, res) {
     res.json(payload);
   } catch (err) {
     console.error('[classrooms-api]', err.message);
-    res.status(500).json({ error: 'Failed to load classroom data' });
+    res.status(500).json({ error: err.message });
   }
 };
