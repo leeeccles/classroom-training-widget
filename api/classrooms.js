@@ -144,7 +144,8 @@ module.exports = async function handler(req, res) {
               await apiFetch(token, `/classrooms/${classroomId}/slots/${slotId}/registrations`)
             );
             return regs.length;
-          } catch {
+          } catch (e) {
+            console.error('[registrations]', e.message);
             return null;
           }
         })(),
