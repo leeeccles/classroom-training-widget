@@ -246,6 +246,8 @@
       gap: var(--sp-2);
       border-right: 1px solid rgba(210,218,225,0.50);
       min-width: 0;
+      height: 160px; /* fixed — same height with or without a session */
+      overflow: hidden;
     }
     .w-body.full-width .p-session { border-right: none; }
 
@@ -345,6 +347,8 @@
       gap: var(--sp-3);
       background: rgba(255,255,255,0.14);
       min-width: 0;
+      height: 160px; /* matches .p-session */
+      overflow: hidden;
     }
 
     /* Frosted instructor card */
