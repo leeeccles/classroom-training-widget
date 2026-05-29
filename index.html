@@ -396,12 +396,12 @@
       <section class="p-next" aria-label="Next live session">
         <div class="next-badge">Next up</div>
         <div class="next-time" id="next-time"></div>
-        <h2 class="next-title" id="next-title">Using AI Effectively at Work</h2>
-        <div class="instructor">
-          <div id="instructor-avatar" class="av" style="background:#2563EB">DL</div>
+        <h2 class="next-title" id="next-title">Loading…</h2>
+        <div class="instructor" id="instructor-section" style="display:none">
+          <div id="instructor-avatar" class="av" style="background:#2563EB"></div>
           <div>
-            <div class="instructor-name" id="instructor-name">Daniel Lee</div>
-            <div class="instructor-role" id="instructor-role">Data &amp; Insights Manager</div>
+            <div class="instructor-name" id="instructor-name"></div>
+            <div class="instructor-role" id="instructor-role"></div>
           </div>
         </div>
         <a class="reserve-btn" id="reserve-btn"
@@ -413,16 +413,11 @@
             <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </a>
-        <div class="attending-row">
-          <div class="av-stack" aria-hidden="true" id="av-stack">
-            <div class="av" style="background:#7C3AED">AS</div>
-            <div class="av" style="background:#059669">MK</div>
-            <div class="av" style="background:#D97706">JP</div>
-          </div>
-          <span class="attending-text" id="attending-text">+24 attending</span>
-          <span class="live-pill">
+        <div class="attending-row" id="attending-row" style="display:none">
+          <span class="attending-text" id="attending-text"></span>
+          <span class="live-pill" id="live-pill" style="display:none">
             <span class="live-dot" aria-hidden="true"></span>
-            Live session
+            Live now
           </span>
         </div>
       </section>
@@ -508,32 +503,46 @@
       document.getElementById('next-title').textContent = session.name;
       document.getElementById('next-time').textContent  = formatDate(session.date);
 
-      var reserveBtn = document.getElementById('reserve-btn');
-      if (session.url) reserveBtn.href = session.url;
+      if (session.url) document.getElementById('reserve-btn').href = session.url;
 
-      var avatarEl = document.getElementById('instructor-avatar');
+      // Trainer — only show section if we have real data
       if (session.trainer) {
         var t = session.trainer;
         document.getElementById('instructor-name').textContent = t.name || '';
         document.getElementById('instructor-role').textContent = t.role || '';
+        document.getElementById('instructor-role').style.display = t.role ? '' : 'none';
 
+        var avatarEl = document.getElementById('instructor-avatar');
         if (t.photoUrl) {
           var img = document.createElement('img');
           img.className = 'av av-photo';
-          img.src   = t.photoUrl;
-          img.alt   = t.name || '';
-          img.width = 28;
+          img.src    = t.photoUrl;
+          img.alt    = t.name || '';
+          img.width  = 28;
           img.height = 28;
           avatarEl.parentNode.replaceChild(img, avatarEl);
         } else {
           avatarEl.style.background = avColour(t.name);
           avatarEl.textContent = initials(t.name);
         }
+        document.getElementById('instructor-section').style.display = '';
       }
 
+      // Attendees + live pill — only show row if we have a count
       if (session.registrationsCount != null) {
         document.getElementById('attending-text').textContent =
-          '+' + session.registrationsCount + ' attending';
+          session.registrationsCount + ' registered';
+        document.getElementById('attending-row').style.display = '';
+      }
+
+      // "Live now" pill — only show if session is happening right now
+      if (session.endDate) {
+        var now = new Date();
+        var start = new Date(session.date);
+        var end   = new Date(session.endDate);
+        if (now >= start && now <= end) {
+          document.getElementById('live-pill').style.display = '';
+        }
       }
     }
 
@@ -564,8 +573,8 @@
       })
       .catch(function (err) {
         console.warn('[widget] could not load live data:', err.message);
-        // Leave placeholder content visible
         buildGrid([0,0,0,0,0]);
+        document.getElementById('next-title').textContent = 'No upcoming sessions';
         document.getElementById('total-label').textContent = 'Live sessions this week';
       });
   </script>
