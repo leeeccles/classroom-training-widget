@@ -22,27 +22,24 @@
     }
 
     :root {
-      --blue:       #2563EB;
-      --blue-h:     #1D4ED8;
-      --indigo:     #4F46E5;
+      --primary:    #4F46E5;
+      --primary-h:  #4338CA;
+      --primary-lt: #6366f1;
       --orange:     #F97316;
       --orange-dk:  #EA580C;
       --text:       #0F172A;
       --text-2:     #64748B;
       --text-3:     #94A3B8;
       --border:     #E2E8F0;
-      --bg:         #F8FAFC;
+      --bg:         #EEF2FF;
       --white:      #FFFFFF;
       --green:      #059669;
       --green-dot:  #34D399;
     }
 
-    /* ── WIDGET SHELL ── */
+    /* ── WIDGET SHELL — no shadow/border/radius for clean iframe embed ── */
     .widget {
       background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(37,99,235,0.09), 0 1px 3px rgba(0,0,0,0.05);
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -55,7 +52,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 11px 18px;
-      background: linear-gradient(130deg, #1e3a8a 0%, #2563EB 50%, #4338ca 100%);
+      background: linear-gradient(130deg, #312E81 0%, #4F46E5 55%, #6366f1 100%);
       gap: 12px;
       flex-shrink: 0;
     }
@@ -183,8 +180,8 @@
       font-weight: 700;
       color: var(--white);
       flex-shrink: 0;
-      background: linear-gradient(135deg, #6366f1 0%, #2563EB 100%);
-      box-shadow: 0 2px 6px rgba(99,102,241,0.4);
+      background: linear-gradient(135deg, #818CF8 0%, #4F46E5 100%);
+      box-shadow: 0 2px 6px rgba(79,70,229,0.4);
     }
 
     .av-photo { object-fit: cover; object-position: center top; }
@@ -207,7 +204,7 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
+      background: linear-gradient(135deg, #4F46E5 0%, #6366f1 100%);
       color: var(--white);
       text-decoration: none;
       font-family: 'Inter', sans-serif;
@@ -218,23 +215,22 @@
       min-height: 36px;
       transition: box-shadow 0.2s ease, transform 0.15s ease;
       cursor: pointer;
-      box-shadow: 0 3px 10px rgba(37,99,235,0.32);
+      box-shadow: 0 3px 10px rgba(79,70,229,0.32);
       letter-spacing: 0.01em;
       touch-action: manipulation;
     }
 
     .reserve-btn:hover {
-      box-shadow: 0 6px 18px rgba(37,99,235,0.42);
+      box-shadow: 0 6px 18px rgba(79,70,229,0.42);
       transform: translateY(-1px);
     }
     .reserve-btn:active  { transform: translateY(0); }
-    .reserve-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .reserve-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
     .attending-row {
       display: flex;
       align-items: center;
       gap: 7px;
-      margin-top: auto;
     }
 
     .attending-text {
@@ -307,9 +303,9 @@
     }
 
     .day.today {
-      background: linear-gradient(155deg, #2563EB 0%, #4F46E5 100%);
+      background: linear-gradient(155deg, #4F46E5 0%, #6366f1 100%);
       border-color: transparent;
-      box-shadow: 0 4px 14px rgba(37,99,235,0.32);
+      box-shadow: 0 4px 14px rgba(79,70,229,0.32);
     }
 
     .d-name {
@@ -351,7 +347,7 @@
     }
 
     .week-banner {
-      background: linear-gradient(135deg, #EFF6FF 0%, #EDE9FE 100%);
+      background: linear-gradient(135deg, #EEF2FF 0%, #EDE9FE 100%);
       border: 1px solid #C7D2FE;
       border-radius: 10px;
       padding: 8px 11px;
@@ -491,7 +487,7 @@
     var MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     var DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
-    var AV_COLOURS = ['#6366f1','#2563EB','#0891B2','#059669','#D97706','#DC2626'];
+    var AV_COLOURS = ['#4F46E5','#6366f1','#0891B2','#059669','#D97706','#7C3AED'];
 
     function avColour(name) {
       return AV_COLOURS[(name || '').charCodeAt(0) % AV_COLOURS.length];
@@ -561,7 +557,7 @@
           img.width = 26; img.height = 26;
           avatarEl.parentNode.replaceChild(img, avatarEl);
         } else {
-          avatarEl.style.background = 'linear-gradient(135deg, ' + avColour(t.name) + ', #2563EB)';
+          avatarEl.style.background = 'linear-gradient(135deg, #818CF8, ' + avColour(t.name) + ')';
           avatarEl.textContent = initials(t.name);
         }
         document.getElementById('instructor-section').style.display = '';
