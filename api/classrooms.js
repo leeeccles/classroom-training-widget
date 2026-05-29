@@ -141,11 +141,10 @@ module.exports = async function handler(req, res) {
         (async () => {
           try {
             const regs = toList(
-              await apiFetch(token, `/classrooms/${classroomId}/slots/${slotId}/registrations`)
+              await apiFetch(token, `/classroom-slots/${slotId}/registrations`)
             );
             return regs.length;
-          } catch (e) {
-            console.error('[registrations]', e.message);
+          } catch {
             return null;
           }
         })(),
