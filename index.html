@@ -6,614 +6,519 @@
   <title>Live Learning Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: auto; }
 
+    /* Body is fully transparent — the page behind the iframe shows through */
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       background: transparent;
-      display: flex;
-      flex-direction: column;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
 
-    :root {
-      --primary:    #4F46E5;
-      --primary-h:  #4338CA;
-      --primary-lt: #6366f1;
-      --orange:     #F97316;
-      --orange-dk:  #EA580C;
-      --text:       #0F172A;
-      --text-2:     #64748B;
-      --text-3:     #94A3B8;
-      --border:     #E2E8F0;
-      --bg:         #EEF2FF;
-      --white:      #FFFFFF;
-      --green:      #059669;
-      --green-dot:  #34D399;
+    /* ──────────────────────────────────────────
+       OUTER WRAPPER — houses the BorderBeam
+       as a sibling so it isn't clipped by the
+       widget's overflow:hidden
+    ────────────────────────────────────────── */
+    .widget-outer {
+      position: relative;
+      border-radius: 20px;
+      animation: widgetIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes widgetIn {
+      from { opacity: 0; transform: translateY(5px) scale(0.993); }
+      to   { opacity: 1; transform: translateY(0)  scale(1); }
     }
 
-    /* ── WIDGET SHELL ── */
+    /* ──────────────────────────────────────────
+       BORDER BEAM
+       Pure CSS port of the BorderBeam component.
+       A gradient spot travels around the border
+       via CSS Motion Path (offset-path).
+    ────────────────────────────────────────── */
+    .border-beam {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1.5px solid transparent;
+      z-index: 10;
+
+      /* Reveal only the border strip (border-box minus padding-box) */
+      mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0) border-box;
+      mask-composite: exclude;
+      -webkit-mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0) border-box;
+      -webkit-mask-composite: destination-out;
+    }
+    .border-beam::after {
+      content: '';
+      position: absolute;
+      aspect-ratio: 1;
+      width: 200px;
+      background: linear-gradient(to left, #ffaa40, #9c40ff, transparent);
+      /* Travel around the element's border rectangle */
+      offset-path: rect(0 auto auto 0 round 200px);
+      offset-anchor: 90% 50%;
+      animation: borderBeam 15s linear infinite;
+    }
+    @keyframes borderBeam {
+      from { offset-distance: 0%; }
+      to   { offset-distance: 100%; }
+    }
+
+    /* ──────────────────────────────────────────
+       GLASS WIDGET
+       Semi-opaque white + backdrop blur. The
+       surrounding page bleeds through the glass.
+    ────────────────────────────────────────── */
     .widget {
-      background: var(--white);
-      border: 1px solid #C7D2FE;
-      border-radius: 12px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(28px) saturate(1.5);
+      -webkit-backdrop-filter: blur(28px) saturate(1.5);
+      border-radius: 20px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      /* Subtle static border beneath the beam */
+      border: 1px solid rgba(255,255,255,0.42);
     }
 
-    /* ── HEADER ── */
+    /* ── PALETTE ── */
+    :root {
+      --ink:      oklch(0.20 0.014 268);
+      --ink-2:    oklch(0.46 0.010 268);
+      --ink-3:    oklch(0.64 0.007 268);
+      --divide:   rgba(0,0,0,0.07);
+      --accent:   oklch(0.50 0.22 294);
+      --accent-dk:oklch(0.40 0.22 294);
+      --accent-lt:oklch(0.94 0.05 294);
+    }
+
+    /* ──────────────────────────────────────────
+       HEADER
+    ────────────────────────────────────────── */
     .w-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 14px 20px;
-      background: linear-gradient(130deg, #312E81 0%, #4F46E5 55%, #6366f1 100%);
+      padding: 13px 20px;
       gap: 12px;
+      background: rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.38);
       flex-shrink: 0;
     }
 
-    .h-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
+    .h-left { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
     .h-icon {
-      width: 34px;
-      height: 34px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.22);
+      width: 30px; height: 30px;
+      background: rgba(255,255,255,0.50);
+      border: 1px solid rgba(255,255,255,0.65);
       border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
+    .h-title { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -0.1px; }
+    .h-sub   { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
 
-    .h-title {
-      font-size: 19px;
+    /* ── week day circles ── */
+    .h-week { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+    .h-day  { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .h-day-name {
+      font-size: 8px; font-weight: 700; color: var(--ink-3);
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .h-day-circle {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--ink-2);
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.50);
+      transition: background 0.15s;
+    }
+    /* today: violet — matches the accent, like "19" in the reference calendar */
+    .h-day.today .h-day-circle {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 2px 10px rgba(100,40,200,0.36);
       font-weight: 800;
-      color: #FFFFFF;
-      letter-spacing: -0.4px;
-      line-height: 1.2;
+    }
+    .h-day.has-sessions .h-day-circle {
+      color: var(--ink);
+      background: rgba(255,255,255,0.55);
+      border-color: rgba(255,255,255,0.65);
     }
 
-    .h-sub {
-      font-size: 13px;
-      color: rgba(255,255,255,0.68);
-      line-height: 1.4;
-      margin-top: 2px;
+    /* session count */
+    .h-count {
+      display: flex; flex-direction: column; align-items: center;
+      padding-left: 12px; margin-left: 4px;
+      border-left: 1px solid var(--divide);
     }
+    .h-count-num { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1; }
+    .h-count-lbl { font-size: 9px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; margin-top: 1px; }
 
+    /* CTA — frosted glass pill */
     .h-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(255,255,255,0.14);
-      border: 1px solid rgba(255,255,255,0.28);
-      color: #FFFFFF;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.40);
+      border: 1px solid rgba(255,255,255,0.58);
+      color: var(--ink);
       text-decoration: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 7px 14px;
-      border-radius: 8px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      min-height: 36px;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px; font-weight: 700;
+      padding: 7px 14px; border-radius: 10px;
+      white-space: nowrap; flex-shrink: 0; min-height: 32px;
+      transition: background 0.15s, border-color 0.15s;
       cursor: pointer;
     }
+    .h-cta:hover { background: rgba(255,255,255,0.65); border-color: rgba(255,255,255,0.80); }
+    .h-cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-    .h-cta:hover        { background: rgba(255,255,255,0.24); border-color: rgba(255,255,255,0.45); }
-    .h-cta:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }
+    /* ──────────────────────────────────────────
+       BODY
+    ────────────────────────────────────────── */
+    .w-body { display: grid; grid-template-columns: 1fr 1fr; }
 
-    /* ── BODY ── */
-    .w-body {
-      display: grid;
-      grid-template-columns: 11fr 9fr;
-    }
-
-    /* ── LEFT: NEXT UP ── */
-    .p-next {
-      padding: 14px 16px 14px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      border-right: 1px solid var(--border);
+    /* ── LEFT: SESSION ── */
+    .p-session {
+      padding: 18px 18px 18px 20px;
+      display: flex; flex-direction: column; justify-content: center; gap: 9px;
+      border-right: 1px solid rgba(255,255,255,0.38);
       min-width: 0;
-      background: var(--white);
     }
 
-    .next-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--orange-dk);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      background: #FFF7ED;
-      border: 1px solid #FED7AA;
-      border-radius: 20px;
-      padding: 3px 9px;
-      width: fit-content;
+    .session-label {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 10px; font-weight: 700; color: var(--ink-3);
+      text-transform: uppercase; letter-spacing: 0.10em;
     }
-
-    .next-time {
-      font-size: 13px;
-      color: var(--text-2);
-      font-weight: 500;
+    .session-label-line {
+      flex: 1; height: 1px; background: var(--divide); max-width: 22px;
     }
-
+    .next-time { font-size: 12px; font-weight: 600; color: var(--ink-2); }
     .next-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.25;
-      letter-spacing: -0.2px;
+      font-size: 20px; font-weight: 800; color: var(--ink);
+      line-height: 1.15; letter-spacing: -0.4px;
+      text-wrap: balance;
+      animation: titleIn 0.5s 0.10s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes titleIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .instructor {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .av {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--white);
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #818CF8 0%, #4F46E5 100%);
-      box-shadow: 0 2px 6px rgba(79,70,229,0.4);
-    }
-
-    .av-photo { object-fit: cover; object-position: center top; }
-
-    .instructor-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.2;
-    }
-
-    .instructor-role {
-      font-size: 12px;
-      color: var(--text-2);
-      line-height: 1.3;
-    }
-
+    /* reserve — violet, high contrast */
     .reserve-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      background: linear-gradient(135deg, #4F46E5 0%, #6366f1 100%);
-      color: var(--white);
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      background: var(--accent);
+      color: #fff;
       text-decoration: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 9px 14px;
-      border-radius: 10px;
-      min-height: 36px;
-      transition: box-shadow 0.2s ease, transform 0.15s ease;
-      cursor: pointer;
-      box-shadow: 0 3px 10px rgba(79,70,229,0.32);
-      letter-spacing: 0.01em;
-      touch-action: manipulation;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 800;
+      padding: 10px 18px; border-radius: 11px; min-height: 38px; width: fit-content;
+      box-shadow: 0 3px 14px rgba(100,40,200,0.30);
+      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+      cursor: pointer; letter-spacing: 0.01em; touch-action: manipulation;
     }
-
     .reserve-btn:hover {
-      box-shadow: 0 6px 18px rgba(79,70,229,0.42);
+      background: var(--accent-dk);
+      box-shadow: 0 5px 20px rgba(100,40,200,0.42);
       transform: translateY(-1px);
     }
-    .reserve-btn:active  { transform: translateY(0); }
-    .reserve-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .reserve-btn:active { transform: translateY(0); }
+    .reserve-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-    .attending-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
+    .attending-row { display: flex; align-items: center; gap: 8px; }
     .attending-text {
-      font-size: 13px;
-      color: var(--text-2);
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      font-size: 12px; color: var(--ink-2); font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
     }
-
     .live-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--green);
-      background: #ECFDF5;
-      border: 1px solid #A7F3D0;
-      border-radius: 20px;
-      padding: 2px 8px;
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 700; color: var(--accent);
+      background: var(--accent-lt);
+      border-radius: 20px; padding: 2px 8px;
     }
-
     .live-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--green-dot);
-      flex-shrink: 0;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
       animation: livePulse 2s ease-in-out infinite;
     }
-
     @keyframes livePulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.85); }
+      50%       { opacity: 0.38; transform: scale(0.72); }
     }
 
-    /* ── RIGHT: THIS WEEK ── */
-    .p-week {
-      padding: 14px 18px 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
+    /* ── RIGHT: INSTRUCTOR ── */
+    .p-right {
+      padding: 18px 20px 18px 18px;
+      display: flex; flex-direction: column; justify-content: center; gap: 12px;
+      background: rgba(255,255,255,0.08);
       min-width: 0;
-      background: var(--bg);
     }
 
-    .week-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-3);
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
+    /* frosted inner card */
+    .instructor-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 13px;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(255,255,255,0.62);
+      border-radius: 13px;
     }
-
-    .days-grid { display: flex; gap: 5px; height: 88px; }
-
-    .day {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 4px;
-      border-radius: 10px;
-      gap: 4px;
-      background: var(--white);
-      border: 1px solid var(--border);
+    .av {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: #fff;
+      flex-shrink: 0; background: var(--accent);
     }
-
-    .day.today {
-      background: linear-gradient(155deg, #4F46E5 0%, #6366f1 100%);
-      border-color: transparent;
-      box-shadow: 0 4px 14px rgba(79,70,229,0.32);
+    .av-photo { object-fit: cover; object-position: center top; }
+    .instructor-info { min-width: 0; }
+    .instructor-label {
+      font-size: 9px; font-weight: 700; color: var(--ink-3);
+      text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 3px;
     }
-
-    .d-name {
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .instructor-name {
+      font-size: 14px; font-weight: 800; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
     }
-
-    .day.today .d-name { color: rgba(255,255,255,0.7); }
-
-    .d-date {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.3px;
+    .instructor-role {
+      font-size: 11px; color: var(--ink-2); font-weight: 600; line-height: 1.3;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-
-    .day.today .d-date { color: var(--white); }
-
-    .d-circle {
-      min-width: 20px;
-      height: 20px;
-      border-radius: 10px;
-      background: #F1F5F9;
-      color: var(--text-2);
-      font-size: 10px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 5px;
-    }
-
-    .day.today .d-circle {
-      background: rgba(255,255,255,0.2);
-      color: var(--white);
-    }
-
-    .week-banner {
-      background: linear-gradient(135deg, #EEF2FF 0%, #EDE9FE 100%);
-      border: 1px solid #C7D2FE;
-      border-radius: 10px;
-      padding: 10px 12px;
-    }
-
-    .banner-headline {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .banner-body {
-      font-size: 12px;
-      color: var(--text-2);
-      margin-top: 2px;
-      line-height: 1.4;
+    .session-tz {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--ink-3); font-weight: 600;
     }
 
     /* ── REDUCED MOTION ── */
     @media (prefers-reduced-motion: reduce) {
-      .h-cta, .reserve-btn { transition: none; }
-      .reserve-btn:hover   { transform: none; }
-      .live-dot            { animation: none; }
+      .widget-outer { animation: none; }
+      .next-title   { animation: none; }
+      .border-beam::after { animation: none; }
+      .reserve-btn  { transition: none; }
+      .reserve-btn:hover { transform: none; }
+      .live-dot     { animation: none; }
     }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 480px) {
-      .w-body          { grid-template-columns: 1fr; }
-      .p-next          { border-right: none; border-bottom: 1px solid var(--border); }
-      .h-sub           { display: none; }
-      .w-header        { padding: 10px 14px; }
-      .p-next, .p-week { padding: 10px 14px; }
+    @media (max-width: 520px) {
+      .w-body { grid-template-columns: 1fr; }
+      .p-session { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.38); }
+      .h-week, .h-count { display: none; }
+      .h-sub { display: none; }
+      .w-header { padding: 12px 14px; }
+      .p-session, .p-right { padding: 14px; }
     }
   </style>
 </head>
 <body>
+  <div class="widget-outer">
 
-  <article class="widget" role="region" aria-label="Live Learning Events">
+    <!-- BorderBeam: amber→violet spot travels the border -->
+    <div class="border-beam" aria-hidden="true"></div>
 
-    <!-- HEADER -->
-    <header class="w-header">
-      <div class="h-left">
-        <div class="h-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-            <rect x="2.5" y="4.5" width="17" height="15" rx="2.5" stroke="white" stroke-width="1.5"/>
-            <path d="M2.5 9h17" stroke="white" stroke-width="1.5"/>
-            <path d="M7 2.5v2M15 2.5v2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-            <rect x="6.5" y="12" width="3" height="2.5" rx="0.5" fill="white"/>
-            <rect x="12.5" y="12" width="3" height="2.5" rx="0.5" fill="white"/>
-          </svg>
-        </div>
-        <div>
-          <div class="h-title">Live Learning Events</div>
-          <div class="h-sub">Expert-led sessions to level up your skills.</div>
-        </div>
-      </div>
-      <a class="h-cta"
-         href="https://app.360learning.com/home/content/classrooms"
-         target="_blank"
-         rel="noopener noreferrer"
-         aria-label="See full calendar of live learning events">
-        See full calendar
-        <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-          <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-    </header>
+    <article class="widget" role="region" aria-label="Live Learning Events">
 
-    <!-- BODY -->
-    <div class="w-body">
-
-      <!-- LEFT: NEXT UP -->
-      <section class="p-next" aria-label="Next live session">
-        <div class="next-badge">
-          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-            <circle cx="4" cy="4" r="3" fill="#EA580C"/>
-          </svg>
-          Next up
-        </div>
-        <div class="next-time" id="next-time"></div>
-        <h2 class="next-title" id="next-title">Loading…</h2>
-        <div class="instructor" id="instructor-section" style="display:none">
-          <div id="instructor-avatar" class="av"></div>
+      <header class="w-header">
+        <div class="h-left">
+          <div class="h-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
+              <rect x="2.5" y="4.5" width="17" height="15" rx="2.5" stroke="oklch(0.22 0.014 268)" stroke-width="1.6"/>
+              <path d="M2.5 9h17" stroke="oklch(0.22 0.014 268)" stroke-width="1.6"/>
+              <path d="M7 2.5v2M15 2.5v2" stroke="oklch(0.22 0.014 268)" stroke-width="1.6" stroke-linecap="round"/>
+              <rect x="6.5" y="12" width="3" height="2.5" rx="0.5" fill="oklch(0.22 0.014 268)"/>
+              <rect x="12.5" y="12" width="3" height="2.5" rx="0.5" fill="oklch(0.22 0.014 268)"/>
+            </svg>
+          </div>
           <div>
-            <div class="instructor-name" id="instructor-name"></div>
-            <div class="instructor-role" id="instructor-role"></div>
+            <div class="h-title">Live Learning Events</div>
+            <div class="h-sub">Expert-led sessions to level up your skills.</div>
           </div>
         </div>
-        <a class="reserve-btn" id="reserve-btn"
+
+        <div class="h-week" id="h-week-strip" aria-label="This week"></div>
+        <div class="h-count">
+          <span class="h-count-num" id="total-num">–</span>
+          <span class="h-count-lbl" id="total-label">this week</span>
+        </div>
+
+        <a class="h-cta"
            href="https://app.360learning.com/home/content/classrooms"
-           target="_blank"
-           rel="noopener noreferrer">
-          Reserve my spot
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+           target="_blank" rel="noopener noreferrer"
+           aria-label="See full calendar of live learning events">
+          Full calendar
+          <svg width="11" height="11" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </a>
-        <div class="attending-row" id="attending-row" style="display:none">
-          <span class="attending-text" id="attending-text">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="8" cy="5" r="3" stroke="#64748B" stroke-width="1.4"/>
-              <path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="#64748B" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="live-pill" id="live-pill" style="display:none">
-            <span class="live-dot" aria-hidden="true"></span>
-            Live now
-          </span>
-        </div>
-      </section>
+      </header>
 
-      <!-- RIGHT: THIS WEEK -->
-      <section class="p-week" aria-label="This week's live sessions">
-        <div class="week-label">This week</div>
-        <div class="days-grid" id="days-grid"></div>
-        <div class="week-banner">
-          <div class="banner-headline">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="5.5" stroke="#4F46E5" stroke-width="1.5"/>
-              <path d="M4.5 7l1.8 1.8L9.5 5" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span id="total-label">Live sessions this week</span>
+      <div class="w-body">
+
+        <section class="p-session" aria-label="Next live session">
+          <div class="session-label">
+            <span>Next up</span>
+            <div class="session-label-line" aria-hidden="true"></div>
           </div>
-          <div class="banner-body">All times shown in your local timezone.</div>
-        </div>
-      </section>
+          <div class="next-time" id="next-time"></div>
+          <h2 class="next-title" id="next-title">Loading…</h2>
+          <a class="reserve-btn" id="reserve-btn"
+             href="https://app.360learning.com/home/content/classrooms"
+             target="_blank" rel="noopener noreferrer">
+            Reserve my spot
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <div class="attending-row" id="attending-row" style="display:none">
+            <span class="attending-text" id="attending-text">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="live-pill" id="live-pill" style="display:none">
+              <span class="live-dot" aria-hidden="true"></span>
+              Live now
+            </span>
+          </div>
+        </section>
 
-    </div>
+        <section class="p-right" aria-label="Session instructor">
+          <div class="instructor-card" id="instructor-section">
+            <div class="av" id="instructor-avatar" aria-hidden="true"></div>
+            <div class="instructor-info">
+              <div class="instructor-label">Instructor</div>
+              <div class="instructor-name" id="instructor-name">—</div>
+              <div class="instructor-role" id="instructor-role"></div>
+            </div>
+          </div>
+          <div class="session-tz">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            All times shown in your local timezone.
+          </div>
+        </section>
 
-  </article>
+      </div>
+    </article>
+  </div>
 
   <script>
-    var DAYS      = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var DAYS      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     var MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-
-    var AV_COLOURS = ['#4F46E5','#6366f1','#0891B2','#059669','#D97706','#7C3AED'];
-
-    function avColour(name) {
-      return AV_COLOURS[(name || '').charCodeAt(0) % AV_COLOURS.length];
+    var DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri'];
+    var AV_COLORS = [
+      'oklch(0.50 0.22 294)','oklch(0.44 0.14 188)','oklch(0.46 0.16 252)',
+      'oklch(0.48 0.16 148)','oklch(0.52 0.16 60)', 'oklch(0.46 0.18 22)',
+    ];
+    function avColor(n) { return AV_COLORS[(n||'').charCodeAt(0) % AV_COLORS.length]; }
+    function initials(n) {
+      var p = (n||'').trim().split(/\s+/);
+      return p.length >= 2 ? (p[0][0]+p[p.length-1][0]).toUpperCase() : (n||'??').slice(0,2).toUpperCase();
     }
-
-    function initials(name) {
-      var parts = (name || '').trim().split(/\s+/);
-      return parts.length >= 2
-        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-        : (name || '??').slice(0, 2).toUpperCase();
-    }
-
     function formatDate(iso) {
       var d = new Date(iso);
-      var h = d.getHours(), m = d.getMinutes();
-      var ampm = h >= 12 ? 'PM' : 'AM';
-      var h12  = h % 12 || 12;
-      var mm   = m ? ':' + String(m).padStart(2, '0') : '';
-      return DAYS[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()] +
-             ' · ' + h12 + mm + ' ' + ampm;
+      var h = d.getHours(), m = d.getMinutes(), ap = h>=12?'PM':'AM', h12 = h%12||12;
+      var mm = m ? ':'+String(m).padStart(2,'0') : '';
+      return DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' · '+h12+mm+' '+ap;
     }
-
-    function buildGrid(sessions) {
-      var today = new Date();
-      var dow   = today.getDay();
-      var mon   = new Date(today);
-      mon.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
-      var grid  = document.getElementById('days-grid');
-      grid.innerHTML = '';
-
-      DAY_NAMES.forEach(function (name, i) {
-        var d = new Date(mon);
-        d.setDate(mon.getDate() + i);
+    function buildHeaderGrid(sessions) {
+      var today = new Date(), dow = today.getDay();
+      var mon = new Date(today); mon.setDate(today.getDate() + (dow===0 ? -6 : 1-dow));
+      var strip = document.getElementById('h-week-strip'); strip.innerHTML = '';
+      DAY_NAMES.forEach(function(name, i) {
+        var d = new Date(mon); d.setDate(mon.getDate()+i);
         var isToday = d.toDateString() === today.toDateString();
-        var count   = sessions[i] !== undefined ? sessions[i] : '–';
-
+        var count   = sessions[i] !== undefined ? sessions[i] : 0;
+        var hasSess = typeof count === 'number' && count > 0;
         var col = document.createElement('div');
-        col.className = 'day' + (isToday ? ' today' : '');
-        col.setAttribute('aria-label',
-          name + ' ' + d.getDate() + ', ' + count + ' sessions' + (isToday ? ' — today' : ''));
-        col.innerHTML =
-          '<span class="d-name">'   + name        + '</span>' +
-          '<span class="d-date">'   + d.getDate() + '</span>' +
-          '<div  class="d-circle">' + count        + '</div>';
-        grid.appendChild(col);
+        col.className = 'h-day'+(isToday?' today':'')+(hasSess?' has-sessions':'');
+        col.setAttribute('aria-label', name+' '+d.getDate()+', '+count+' session'+(count!==1?'s':'')+(isToday?' — today':''));
+        col.innerHTML = '<span class="h-day-name">'+name.charAt(0)+'</span><div class="h-day-circle">'+d.getDate()+'</div>';
+        strip.appendChild(col);
       });
     }
-
-    function applyNextSession(session) {
-      document.getElementById('next-title').textContent = session.name;
-      document.getElementById('next-time').textContent  = formatDate(session.date);
-
-      if (session.url) document.getElementById('reserve-btn').href = session.url;
-
-      // Trainer — only show if real data exists
-      if (session.trainer) {
-        var t = session.trainer;
-        document.getElementById('instructor-name').textContent = t.name || '';
+    function setNoSessions() {
+      document.getElementById('next-time').textContent = '';
+      document.getElementById('next-title').textContent = 'More sessions coming soon';
+      var btn = document.getElementById('reserve-btn');
+      btn.textContent = 'Browse the catalogue';
+      btn.style.background = 'rgba(0,0,0,0.15)';
+      btn.style.color = 'oklch(0.46 0.010 268)';
+      btn.style.boxShadow = 'none';
+      btn.style.border = '1px solid rgba(0,0,0,0.10)';
+    }
+    function applyNextSession(s) {
+      document.getElementById('next-title').textContent = s.name;
+      document.getElementById('next-time').textContent  = formatDate(s.date);
+      if (s.url) document.getElementById('reserve-btn').href = s.url;
+      if (s.trainer) {
+        var t = s.trainer;
+        document.getElementById('instructor-name').textContent = t.name || '—';
         document.getElementById('instructor-role').textContent = t.role || '';
         document.getElementById('instructor-role').style.display = t.role ? '' : 'none';
-
-        var avatarEl = document.getElementById('instructor-avatar');
+        var el = document.getElementById('instructor-avatar');
         if (t.photoUrl) {
           var img = document.createElement('img');
-          img.className = 'av av-photo';
-          img.src = t.photoUrl; img.alt = t.name || '';
-          img.width = 26; img.height = 26;
-          avatarEl.parentNode.replaceChild(img, avatarEl);
+          img.className = 'av av-photo'; img.src = t.photoUrl; img.alt = t.name||'';
+          img.width = 38; img.height = 38;
+          el.parentNode.replaceChild(img, el);
         } else {
-          avatarEl.style.background = 'linear-gradient(135deg, #818CF8, ' + avColour(t.name) + ')';
-          avatarEl.textContent = initials(t.name);
+          el.style.background = avColor(t.name);
+          el.textContent = initials(t.name);
         }
-        document.getElementById('instructor-section').style.display = '';
       }
-
-      // Attending count — only show if real data exists
-      if (session.registrationsCount != null) {
-        var textEl = document.getElementById('attending-text');
-        // Keep the SVG icon, append count after it
-        textEl.innerHTML =
-          '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">' +
-          '<circle cx="8" cy="5" r="3" stroke="#64748B" stroke-width="1.4"/>' +
-          '<path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="#64748B" stroke-width="1.4" stroke-linecap="round"/>' +
-          '</svg>' +
-          ' ' + session.registrationsCount + ' registered';
+      if (s.registrationsCount != null) {
+        var te = document.getElementById('attending-text');
+        te.innerHTML =
+          '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">'+
+          '<circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>'+
+          '<path d="M2 13c0-3 2.686-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>'+
+          '</svg> '+s.registrationsCount+' registered';
         document.getElementById('attending-row').style.display = '';
       }
-
-      // "Live now" pill — only during session window
-      if (session.endDate) {
+      if (s.endDate) {
         var now = new Date();
-        if (now >= new Date(session.date) && now <= new Date(session.endDate)) {
+        if (now >= new Date(s.date) && now <= new Date(s.endDate))
           document.getElementById('live-pill').style.display = '';
-        }
       }
     }
-
-    // Render placeholders immediately
-    buildGrid(['–','–','–','–','–']);
-    (function () {
-      var today = new Date();
+    buildHeaderGrid([0,0,0,0,0]);
+    (function() {
+      var t = new Date();
       document.getElementById('next-time').textContent =
-        DAYS[today.getDay()] + ' ' + today.getDate() + ' ' + MONTHS[today.getMonth()];
+        DAYS[t.getDay()]+' '+t.getDate()+' '+MONTHS[t.getMonth()];
     }());
-
-    // Fetch live data and update
     fetch('/api/classrooms')
-      .then(function (res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        if (data.weekSessions) buildGrid(data.weekSessions);
-
+      .then(function(r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(data) {
+        if (data.weekSessions) buildHeaderGrid(data.weekSessions);
         var total = data.total != null ? data.total : 0;
-        document.getElementById('total-label').textContent =
-          total + ' live session' + (total !== 1 ? 's' : '') + ' this week';
-
-        if (data.nextSession) applyNextSession(data.nextSession);
+        document.getElementById('total-num').textContent  = total;
+        document.getElementById('total-label').textContent = 'session'+(total!==1?'s':'')+' this week';
+        if (data.nextSession) {
+          applyNextSession(data.nextSession);
+        } else {
+          setNoSessions();
+        }
       })
-      .catch(function (err) {
-        console.warn('[widget] could not load live data:', err.message);
-        buildGrid([0,0,0,0,0]);
-        document.getElementById('next-title').textContent = 'No upcoming sessions';
-        document.getElementById('total-label').textContent = 'Live sessions this week';
+      .catch(function(err) {
+        console.warn('[widget]', err.message);
+        buildHeaderGrid([0,0,0,0,0]);
+        setNoSessions();
+        document.getElementById('total-num').textContent = '0';
       });
   </script>
-
 </body>
 </html>
