@@ -19,12 +19,19 @@ async function getToken() {
     }),
   });
 
+  const rawBody = await res.text();
+  console.log(`[token] status=${res.status} url=${TOKEN_URL} body=${rawBody.slice(0, 300)}`);
+
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Token request failed ${res.status}: ${body}`);
+    throw new Error(`Token request failed ${res.status}: ${rawBody.slice(0, 200)}`);
   }
 
-  const data = await res.json();
+  let data;
+  try {
+    data = JSON.parse(rawBody);
+  } catch (e) {
+    throw new Error(`Token response not JSON (status ${res.status}): ${rawBody.slice(0, 200)}`);
+  }
   _token = data.access_token;
   // Expire 60 s before the server says so
   _tokenExpiry = Date.now() + ((data.expires_in || 3600) - 60) * 1000;
