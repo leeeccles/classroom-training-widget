@@ -62,6 +62,29 @@ function parseSlotStart(slot) {
   return raw ? new Date(raw).getTime() : null;
 }
 
+function slotStartTime(slot) {
+  const ms = parseSlotStart(slot);
+  if (!ms) return null;
+  const d = new Date(ms);
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function slotDuration(slot) {
+  const start = parseSlotStart(slot);
+  const end = slot.endDate ? new Date(slot.endDate).getTime() : null;
+  if (!start || !end) return null;
+  return Math.round((end - start) / 60000);
+}
+
+function classroomCategory(classroom) {
+  return classroom.category
+    ?? (Array.isArray(classroom.tags) && classroom.tags[0])
+    ?? (Array.isArray(classroom.labels) && classroom.labels[0])
+    ?? null;
+}
+
+const FILLING_FAST_THRESHOLD = 0.70;
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
@@ -69,16 +92,17 @@ module.exports = async function handler(req, res) {
   try {
     const token = await getToken();
     const groupId = process.env.LEARNING_GROUP_ID;
-
     const qs = groupId ? `?groupId[eq]=${encodeURIComponent(groupId)}` : '';
     const classrooms = toList(await apiFetch(token, `/classrooms${qs}`));
 
     const now = new Date();
     const { monday, nextMonday } = getWeekBounds(now);
 
+    // Collect all slots for this week + track the single next upcoming slot
+    const weekSlots = [];
     let nextSlot = null;
     let nextClassroom = null;
-    const dayCounts = [0, 0, 0, 0, 0]; // Mon → Fri
+    const dayCounts = [0, 0, 0, 0, 0];
 
     await Promise.all(
       classrooms.slice(0, 30).map(async (classroom) => {
@@ -94,9 +118,13 @@ module.exports = async function handler(req, res) {
           const startMs = parseSlotStart(slot);
           if (!startMs) continue;
 
-          if (startMs >= monday.getTime() && startMs < nextMonday.getTime()) {
-            const dow = new Date(startMs).getDay();
-            if (dow >= 1 && dow <= 5) dayCounts[dow - 1]++;
+          const startDate = new Date(startMs);
+          const dow = startDate.getDay();
+
+          if (startMs >= monday.getTime() && startMs < nextMonday.getTime() && dow >= 1 && dow <= 5) {
+            const dayIndex = dow - 1;
+            dayCounts[dayIndex]++;
+            weekSlots.push({ classroom, slot, dayIndex, startMs, dayNum: startDate.getDate() });
           }
 
           if (startMs > now.getTime()) {
@@ -109,60 +137,108 @@ module.exports = async function handler(req, res) {
       })
     );
 
-    const payload = {
-      weekSessions: dayCounts,
-      total: dayCounts.reduce((a, b) => a + b, 0),
-      nextSession: null,
-    };
+    weekSlots.sort((a, b) => a.startMs - b.startMs);
 
+    // Enrich each week slot with trainer + registrations/capacity
+    const enriched = await Promise.all(
+      weekSlots.slice(0, 25).map(async ({ classroom, slot, dayIndex, startMs, dayNum }) => {
+        const slotId = slot._id ?? slot.id;
+        const classroomId = classroom._id ?? classroom.id;
+        const trainerIds = slot.trainerIds ?? [];
+
+        const [trainer, registrationsCount] = await Promise.all([
+          (async () => {
+            if (!trainerIds.length) return null;
+            try {
+              const user = await apiFetch(token, `/users/${trainerIds[0]}`);
+              return {
+                name: user.name ?? [user.firstName, user.lastName].filter(Boolean).join(' ') ?? '',
+                role: user.jobTitle ?? user.role ?? user.title ?? '',
+                photoUrl: user.picture ?? user.photoUrl ?? user.avatarUrl ?? null,
+              };
+            } catch { return null; }
+          })(),
+          (async () => {
+            try {
+              const regs = toList(await apiFetch(token, `/classroom-slots/${slotId}/registrations`));
+              return regs.length;
+            } catch { return null; }
+          })(),
+        ]);
+
+        const totalCapacity = slot.maxAttendees ?? slot.maxRegistrations ?? slot.capacity ?? null;
+        const seatsLeft = (totalCapacity != null && registrationsCount != null)
+          ? Math.max(0, totalCapacity - registrationsCount)
+          : null;
+        const fillingFast = (totalCapacity && registrationsCount != null && seatsLeft != null && seatsLeft > 0)
+          ? (registrationsCount / totalCapacity) >= FILLING_FAST_THRESHOLD
+          : false;
+
+        return {
+          dayIndex,
+          dayNum,
+          name: classroom.name ?? classroom.title ?? 'Upcoming Session',
+          startTime: slotStartTime(slot),
+          duration: slotDuration(slot),
+          category: classroomCategory(classroom),
+          url: `https://app.360learning.com/home/content/classrooms/${classroomId}`,
+          trainer,
+          registrationsCount,
+          totalCapacity,
+          seatsLeft,
+          fillingFast,
+        };
+      })
+    );
+
+    // Group by day
+    const byDay = {};
+    enriched.forEach(s => {
+      if (!byDay[s.dayNum]) byDay[s.dayNum] = { dayNum: s.dayNum, dayIndex: s.dayIndex, sessions: [] };
+      byDay[s.dayNum].sessions.push(s);
+    });
+    const weekDays = Object.values(byDay);
+
+    // Build nextSession payload (kept for backward compatibility)
+    let nextSession = null;
     if (nextSlot && nextClassroom) {
       const classroomId = nextClassroom._id ?? nextClassroom.id;
       const slotId = nextSlot._id ?? nextSlot.id;
       const trainerIds = nextSlot.trainerIds ?? [];
 
-      // Fetch trainer profile and registrations count in parallel
       const [trainer, registrationsCount] = await Promise.all([
         (async () => {
           if (!trainerIds.length) return null;
           try {
             const user = await apiFetch(token, `/users/${trainerIds[0]}`);
-            const name = user.name
-              ?? [user.firstName, user.lastName].filter(Boolean).join(' ')
-              ?? '';
-            return {
-              name,
-              role: user.jobTitle ?? user.role ?? user.title ?? '',
-              photoUrl: user.picture ?? user.photoUrl ?? user.avatarUrl ?? null,
-            };
-          } catch {
-            return null;
-          }
+            const name = user.name ?? [user.firstName, user.lastName].filter(Boolean).join(' ') ?? '';
+            return { name, role: user.jobTitle ?? user.role ?? user.title ?? '', photoUrl: user.picture ?? user.photoUrl ?? user.avatarUrl ?? null };
+          } catch { return null; }
         })(),
         (async () => {
           try {
-            const regs = toList(
-              await apiFetch(token, `/classroom-slots/${slotId}/registrations`)
-            );
+            const regs = toList(await apiFetch(token, `/classroom-slots/${slotId}/registrations`));
             return regs.length;
-          } catch {
-            return null;
-          }
+          } catch { return null; }
         })(),
       ]);
 
-      payload.nextSession = {
+      nextSession = {
         name: nextClassroom.name ?? nextClassroom.title ?? 'Upcoming Session',
         date: nextSlot.startDate,
         endDate: nextSlot.endDate ?? null,
-        location: nextSlot.location ?? null,
-        virtual: nextSlot.virtual ?? false,
         url: `https://app.360learning.com/home/content/classrooms/${classroomId}`,
         trainer,
         registrationsCount,
       };
     }
 
-    res.json(payload);
+    res.json({
+      weekDays,
+      weekSessions: dayCounts,
+      total: dayCounts.reduce((a, b) => a + b, 0),
+      nextSession,
+    });
   } catch (err) {
     console.error('[classrooms-api]', err.message);
     res.status(500).json({ error: 'Failed to load classroom data' });
