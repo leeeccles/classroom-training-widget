@@ -6,12 +6,14 @@
   <title>Live Learning Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       background: transparent;
+      overflow: hidden;
+      padding: 2px 0 6px;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -36,12 +38,14 @@
     /* ── WIDGET SHELL ── */
     .widget {
       width: 100%;
-      max-width: 760px;
+      height: 480px;        /* fixed — must match iframe height attribute */
+      overflow: hidden;
       background: var(--bg);
       border: 0.5px solid rgba(0, 0, 0, 0.12);
       border-radius: var(--r);
-      overflow: hidden;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
     }
 
     /* ── HEADER ── */
@@ -85,7 +89,7 @@
       text-align: center;
       border: 0.5px solid var(--bd);
       background: transparent;
-      font-family: inherit;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       transition: background 0.12s, border-color 0.12s;
     }
     .ws-day:hover:not(.is-active) { background: var(--surf); }
@@ -102,7 +106,7 @@
     .ws-day.is-active .ws-dot  { background: var(--blue); }
 
     /* ── SESSION LIST ── */
-    .sl { padding: 0.5rem 0.9rem; }
+    .sl { padding: 0.5rem 0.9rem; flex: 1; overflow: hidden; }
 
     .sl-row {
       display: flex;
@@ -160,7 +164,7 @@
       color: var(--blue);
       background: transparent;
       cursor: pointer;
-      font-family: inherit;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       white-space: nowrap;
       text-decoration: none;
       transition: background 0.12s;
@@ -200,7 +204,7 @@
       color: var(--ink);
       background: var(--bg);
       text-decoration: none;
-      font-family: inherit;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       cursor: pointer;
       transition: background 0.12s;
     }
@@ -386,7 +390,7 @@
 
   function renderSessions(dayNum) {
     var list = document.getElementById('session-list');
-    var sessions = (weekData[dayNum] || {}).sessions || [];
+    var sessions = ((weekData[dayNum] || {}).sessions || []).slice(0, 2);
 
     if (!sessions.length) {
       list.innerHTML =
@@ -482,9 +486,16 @@
       { startTime:'13:00', duration:90, category:'Marketing', name:'Brand storytelling workshop',
         host:'R. Singh', seatsLeft:5, totalCapacity:12, fillingFast:false, url:'#' },
     ]};
+    var fri = weekDays[4];
+    weekData[fri.getDate()] = { sessions: [
+      { startTime:'10:00', duration:60, category:'Leadership', name:'Difficult conversations at work',
+        host:'L. Eccles', seatsLeft:3, totalCapacity:12, fillingFast:true, url:'#' },
+      { startTime:'14:30', duration:90, category:'Sales', name:'Intro to consultative selling',
+        host:'M. Patel', seatsLeft:8, totalCapacity:20, fillingFast:false, url:'#' },
+    ]};
 
     document.getElementById('total-num').textContent = '6';
-    buildStrip([1, 2, 1, 2, 0]);
+    buildStrip([1, 2, 1, 2, 2]);
     renderSessions(activeDayNum);
   }
 
