@@ -85,6 +85,41 @@ function classroomCategory(classroom) {
 
 const FILLING_FAST_THRESHOLD = 0.70;
 
+// Persists across warm Vercel invocations — avoids re-fetching the same classroom path
+const pathCache = {};
+
+async function resolvePathUrl(token, classroomId, classroom) {
+  if (pathCache[classroomId]) return pathCache[classroomId];
+
+  // 1. Check if the classroom object already carries path info
+  const inlinePathId =
+    (Array.isArray(classroom.pathIds) && classroom.pathIds[0]) ||
+    (Array.isArray(classroom.paths) && classroom.paths[0] &&
+      (typeof classroom.paths[0] === 'string'
+        ? classroom.paths[0]
+        : (classroom.paths[0]._id ?? classroom.paths[0].id))) ||
+    (Array.isArray(classroom.learningPathIds) && classroom.learningPathIds[0]) ||
+    null;
+
+  if (inlinePathId) {
+    return (pathCache[classroomId] = `https://app.360learning.com/paths/${inlinePathId}/home`);
+  }
+
+  // 2. Query the paths API to find which path contains this classroom
+  try {
+    const results = toList(
+      await apiFetch(token, `/paths?classroomId[eq]=${encodeURIComponent(classroomId)}`)
+    );
+    const pathId = results[0] && (results[0]._id ?? results[0].id);
+    if (pathId) {
+      return (pathCache[classroomId] = `https://app.360learning.com/paths/${pathId}/home`);
+    }
+  } catch { /* fall through */ }
+
+  // 3. Fall back to the classroom page
+  return (pathCache[classroomId] = `https://app.360learning.com/home/content/classrooms/${classroomId}`);
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
@@ -146,7 +181,7 @@ module.exports = async function handler(req, res) {
         const classroomId = classroom._id ?? classroom.id;
         const trainerIds = slot.trainerIds ?? [];
 
-        const [trainer, registrationsCount] = await Promise.all([
+        const [trainer, registrationsCount, url] = await Promise.all([
           (async () => {
             if (!trainerIds.length) return null;
             try {
@@ -164,6 +199,7 @@ module.exports = async function handler(req, res) {
               return regs.length;
             } catch { return null; }
           })(),
+          resolvePathUrl(token, classroomId, classroom),
         ]);
 
         const totalCapacity = slot.maxAttendees ?? slot.maxRegistrations ?? slot.capacity ?? null;
@@ -181,7 +217,7 @@ module.exports = async function handler(req, res) {
           startTime: slotStartTime(slot),
           duration: slotDuration(slot),
           category: classroomCategory(classroom),
-          url: `https://app.360learning.com/home/content/classrooms/${classroomId}`,
+          url,
           trainer,
           registrationsCount,
           totalCapacity,
@@ -206,7 +242,7 @@ module.exports = async function handler(req, res) {
       const slotId = nextSlot._id ?? nextSlot.id;
       const trainerIds = nextSlot.trainerIds ?? [];
 
-      const [trainer, registrationsCount] = await Promise.all([
+      const [trainer, registrationsCount, nextUrl] = await Promise.all([
         (async () => {
           if (!trainerIds.length) return null;
           try {
@@ -221,13 +257,14 @@ module.exports = async function handler(req, res) {
             return regs.length;
           } catch { return null; }
         })(),
+        resolvePathUrl(token, classroomId, nextClassroom),
       ]);
 
       nextSession = {
         name: nextClassroom.name ?? nextClassroom.title ?? 'Upcoming Session',
         date: nextSlot.startDate,
         endDate: nextSlot.endDate ?? null,
-        url: `https://app.360learning.com/home/content/classrooms/${classroomId}`,
+        url: nextUrl,
         trainer,
         registrationsCount,
       };
