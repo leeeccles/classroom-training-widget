@@ -173,6 +173,18 @@
     .sl-btn.waitlist { border-color: var(--bd); color: var(--ink-3); }
     .sl-btn.waitlist:hover { background: var(--surf); }
 
+    /* Skeleton shimmer */
+    @keyframes shimmer {
+      from { background-position: 200% center; }
+      to   { background-position: -200% center; }
+    }
+    .sk {
+      border-radius: 6px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+      background-size: 400% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+    }
+
     /* Empty state */
     .sl-empty {
       padding: 2.4rem 1rem;
@@ -215,6 +227,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .ws-day, .sl-btn, .wf-btn { transition: none; }
+      .sk { animation: none; }
     }
 
     /* ── RESPONSIVE ── */
@@ -301,9 +314,10 @@
   }
 
   /* ── STATE ── */
-  var weekData   = {};  // dayNum → { sessions: [] }
-  var dayBtns    = {};  // dayNum → <button>
+  var weekData     = {};
+  var dayBtns      = {};
   var activeDayNum = null;
+  var loaded       = false;
 
   /* ── WEEK DAYS ── */
   function getWeekDays() {
@@ -352,7 +366,6 @@
         '<div class="ws-dots">' + dots + '</div>';
 
       btn.addEventListener('click', makeSelectDay(dayNum, btn));
-
       strip.appendChild(btn);
       dayBtns[dayNum] = btn;
       if (isToday) activeDayNum = dayNum;
@@ -361,11 +374,8 @@
     // Weekend fallback: show Monday
     if (!activeDayNum && weekDays.length) {
       activeDayNum = weekDays[0].getDate();
-      var fallbackBtn = dayBtns[activeDayNum];
-      if (fallbackBtn) {
-        fallbackBtn.classList.add('is-active');
-        fallbackBtn.setAttribute('aria-selected', 'true');
-      }
+      var fb = dayBtns[activeDayNum];
+      if (fb) { fb.classList.add('is-active'); fb.setAttribute('aria-selected', 'true'); }
     }
   }
 
@@ -378,8 +388,34 @@
       btn.classList.add('is-active');
       btn.setAttribute('aria-selected', 'true');
       activeDayNum = dayNum;
-      renderSessions(dayNum);
+      if (loaded) {
+        renderSessions(dayNum);
+      }
     };
+  }
+
+  /* ── SKELETON LOADING STATE ── */
+  function skRow() {
+    return '<div class="sl-row">' +
+      '<div class="sl-t">' +
+      '<div class="sk" style="width:42px;height:22px;margin:0 auto 6px;"></div>' +
+      '<div class="sk" style="width:30px;height:12px;margin:0 auto;"></div>' +
+      '</div>' +
+      '<div class="sl-m">' +
+      '<div class="sk" style="width:72px;height:20px;margin-bottom:8px;"></div>' +
+      '<div class="sk" style="width:65%;height:20px;margin-bottom:8px;"></div>' +
+      '<div class="sk" style="width:45%;height:14px;margin-bottom:8px;"></div>' +
+      '<div class="sk" style="width:130px;height:10px;"></div>' +
+      '</div>' +
+      '<div class="sl-a">' +
+      '<div class="sk" style="width:82px;height:34px;border-radius:7px;"></div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function showSkeleton() {
+    buildStrip([0, 0, 0, 0, 0]);
+    document.getElementById('session-list').innerHTML = skRow() + skRow();
   }
 
   /* ── SESSION LIST ── */
@@ -409,123 +445,71 @@
       var c = catColors(s.category);
       var isWaitlist = s.seatsLeft === 0;
       var isLow = !isWaitlist && s.seatsLeft != null && s.seatsLeft <= 3;
-
       var seatLabel = isWaitlist ? 'Waitlist only'
-        : s.seatsLeft != null ? s.seatsLeft + ' seats left'
-        : '';
+        : s.seatsLeft != null ? s.seatsLeft + ' seats left' : '';
       var seatClass = isLow ? 'low' : 'ok';
-
       var filled = (s.totalCapacity > 0 && s.seatsLeft != null)
-        ? Math.round(((s.totalCapacity - s.seatsLeft) / s.totalCapacity) * 100)
-        : null;
-
+        ? Math.round(((s.totalCapacity - s.seatsLeft) / s.totalCapacity) * 100) : null;
       var hostName = s.trainer ? s.trainer.name : (s.host || '');
       var barColor = isWaitlist ? '#9ca3af' : c.bar;
-
       var catTag = s.category
-        ? '<span class="sl-tag" style="background:' + c.bg + ';color:' + c.fg + ';">' + s.category + '</span>'
-        : '';
-
+        ? '<span class="sl-tag" style="background:' + c.bg + ';color:' + c.fg + ';">' + s.category + '</span>' : '';
       var fillingTag = s.fillingFast
-        ? '<span class="sl-tag" style="background:#eff6ff;color:#1d4ed8;">' + FLAME_SVG + 'Filling fast</span>'
-        : '';
-
+        ? '<span class="sl-tag" style="background:#eff6ff;color:#1d4ed8;">' + FLAME_SVG + 'Filling fast</span>' : '';
       var metaRow = hostName
-        ? '<div class="sl-meta">' +
-          '<div class="sl-av">' + initials(hostName) + '</div>' +
+        ? '<div class="sl-meta"><div class="sl-av">' + initials(hostName) + '</div>' +
           '<span class="sl-host">' + hostName + '</span>' +
           (seatLabel ? '<span class="sl-sep">·</span><span class="sl-seats ' + seatClass + '">' + seatLabel + '</span>' : '') +
-          '</div>'
-        : '';
-
+          '</div>' : '';
       var progRow = filled != null
-        ? '<div class="sl-prog">' +
-          '<div class="sl-prog-track"><div class="sl-prog-bar" style="width:' + filled + '%;background:' + barColor + ';"></div></div>' +
-          '<span class="sl-prog-lbl">' + filled + '% full</span>' +
-          '</div>'
-        : '';
-
+        ? '<div class="sl-prog"><div class="sl-prog-track"><div class="sl-prog-bar" style="width:' + filled + '%;background:' + barColor + ';"></div></div>' +
+          '<span class="sl-prog-lbl">' + filled + '% full</span></div>' : '';
       var btnClass = 'sl-btn' + (isWaitlist ? ' waitlist' : '');
       var btnLabel = isWaitlist ? 'Join waitlist' : 'Book now';
       var href = s.url || 'https://app.360learning.com/home/content/classrooms';
 
       return '<div class="sl-row">' +
-        '<div class="sl-t">' +
-        '<div class="sl-time">' + (s.startTime || '') + '</div>' +
-        (s.duration ? '<div class="sl-dur">' + s.duration + ' min</div>' : '') +
-        '</div>' +
-        '<div class="sl-m">' +
-        '<div class="sl-tags">' + catTag + fillingTag + '</div>' +
-        '<p class="sl-title">' + s.name + '</p>' +
-        metaRow +
-        progRow +
-        '</div>' +
-        '<div class="sl-a">' +
-        '<a class="' + btnClass + '" href="' + href + '" target="_blank" rel="noopener noreferrer">' + btnLabel + '</a>' +
-        '</div>' +
+        '<div class="sl-t"><div class="sl-time">' + (s.startTime || '') + '</div>' +
+        (s.duration ? '<div class="sl-dur">' + s.duration + ' min</div>' : '') + '</div>' +
+        '<div class="sl-m"><div class="sl-tags">' + catTag + fillingTag + '</div>' +
+        '<p class="sl-title">' + s.name + '</p>' + metaRow + progRow + '</div>' +
+        '<div class="sl-a"><a class="' + btnClass + '" href="' + href + '" target="_blank" rel="noopener noreferrer">' + btnLabel + '</a></div>' +
         '</div>';
     }).join('');
   }
 
-  /* ── DEMO DATA (shown immediately / used as fallback) ── */
-  function applyDemo() {
-    var weekDays = getWeekDays();
-    var thu = weekDays[3];
-    var tue = weekDays[1];
-
-    weekData = {};
-    weekData[thu.getDate()] = { sessions: [
-      { startTime:'10:00', duration:90, category:'Leadership', name:'Difficult conversations at work',
-        host:'L. Eccles', seatsLeft:3, totalCapacity:12, fillingFast:true, url:'#' },
-      { startTime:'14:30', duration:60, category:'Sales', name:'Intro to consultative selling',
-        host:'M. Patel', seatsLeft:8, totalCapacity:20, fillingFast:false, url:'#' },
-    ]};
-    weekData[tue.getDate()] = { sessions: [
-      { startTime:'09:30', duration:45, category:'Finance', name:'Spreadsheets for finance teams',
-        host:'L. Eccles', seatsLeft:0, totalCapacity:15, fillingFast:false, url:'#' },
-      { startTime:'13:00', duration:90, category:'Marketing', name:'Brand storytelling workshop',
-        host:'R. Singh', seatsLeft:5, totalCapacity:12, fillingFast:false, url:'#' },
-    ]};
-    var fri = weekDays[4];
-    weekData[fri.getDate()] = { sessions: [
-      { startTime:'10:00', duration:60, category:'Leadership', name:'Difficult conversations at work',
-        host:'L. Eccles', seatsLeft:3, totalCapacity:12, fillingFast:true, url:'#' },
-      { startTime:'14:30', duration:90, category:'Sales', name:'Intro to consultative selling',
-        host:'M. Patel', seatsLeft:8, totalCapacity:20, fillingFast:false, url:'#' },
-    ]};
-
-    document.getElementById('total-num').textContent = '6';
-    buildStrip([1, 2, 1, 2, 2]);
-    renderSessions(activeDayNum);
-  }
-
-  /* ── INIT ── */
-  applyDemo();
+  /* ── INIT: skeleton → API → render ── */
+  showSkeleton();
 
   fetch('/api/classrooms')
     .then(function(r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
     .then(function(data) {
-      if (!data.weekDays || !data.weekDays.length) return;
-
       weekData = {};
-      data.weekDays.forEach(function(day) { weekData[day.dayNum] = day; });
+      if (data.weekDays) {
+        data.weekDays.forEach(function(day) { weekData[day.dayNum] = day; });
+      }
 
       var counts = [0, 0, 0, 0, 0];
-      data.weekDays.forEach(function(day) {
-        if (day.dayIndex >= 0 && day.dayIndex <= 4) {
-          counts[day.dayIndex] = (day.sessions || []).length;
-        }
-      });
+      if (data.weekDays) {
+        data.weekDays.forEach(function(day) {
+          if (day.dayIndex >= 0 && day.dayIndex <= 4) {
+            counts[day.dayIndex] = (day.sessions || []).length;
+          }
+        });
+      }
 
       var total = data.total != null ? data.total : counts.reduce(function(a, b) { return a + b; }, 0);
       document.getElementById('total-num').textContent = total;
 
+      loaded = true;
       buildStrip(counts);
       renderSessions(activeDayNum);
     })
     .catch(function(err) {
       console.warn('[widget]', err.message);
-      // keep demo data
+      loaded = true;
+      buildStrip([0, 0, 0, 0, 0]);
+      renderSessions(activeDayNum); // shows empty state
     });
 </script>
 </body>
