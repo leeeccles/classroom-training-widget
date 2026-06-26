@@ -85,39 +85,25 @@ function classroomCategory(classroom) {
 
 const FILLING_FAST_THRESHOLD = 0.70;
 
-// Persists across warm Vercel invocations — avoids re-fetching the same classroom path
-const pathCache = {};
-
-async function resolvePathUrl(token, classroomId, classroom) {
-  if (pathCache[classroomId]) return pathCache[classroomId];
-
-  // 1. Check if the classroom object already carries path info
-  const inlinePathId =
-    (Array.isArray(classroom.pathIds) && classroom.pathIds[0]) ||
-    (Array.isArray(classroom.paths) && classroom.paths[0] &&
-      (typeof classroom.paths[0] === 'string'
-        ? classroom.paths[0]
-        : (classroom.paths[0]._id ?? classroom.paths[0].id))) ||
-    (Array.isArray(classroom.learningPathIds) && classroom.learningPathIds[0]) ||
-    null;
-
-  if (inlinePathId) {
-    return (pathCache[classroomId] = `https://app.360learning.com/paths/${inlinePathId}/home`);
-  }
-
-  // 2. Query the paths API to find which path contains this classroom
-  try {
-    const results = toList(
-      await apiFetch(token, `/paths?classroomId[eq]=${encodeURIComponent(classroomId)}`)
-    );
-    const pathId = results[0] && (results[0]._id ?? results[0].id);
-    if (pathId) {
-      return (pathCache[classroomId] = `https://app.360learning.com/paths/${pathId}/home`);
+// Fetches all paths and returns a map of classroomId → path URL.
+// Path steps with type "classroom" carry the classroom _id directly.
+async function buildPathMap(token) {
+  const paths = toList(await apiFetch(token, '/paths'));
+  const map = {};
+  for (const path of paths) {
+    const pathId = path._id ?? path.id;
+    if (!pathId) continue;
+    for (const step of (path.steps || [])) {
+      if (step.type === 'classroom' && step._id) {
+        map[step._id] = `https://app.360learning.com/paths/${pathId}/home`;
+      }
     }
-  } catch { /* fall through */ }
+  }
+  return map;
+}
 
-  // 3. Fall back to the classroom page
-  return (pathCache[classroomId] = `https://app.360learning.com/home/content/classrooms/${classroomId}`);
+function sessionUrl(classroomId, pathMap) {
+  return pathMap[classroomId] || `https://app.360learning.com/home/content/classrooms/${classroomId}`;
 }
 
 module.exports = async function handler(req, res) {
@@ -128,7 +114,13 @@ module.exports = async function handler(req, res) {
     const token = await getToken();
     const groupId = process.env.LEARNING_GROUP_ID;
     const qs = groupId ? `?groupId[eq]=${encodeURIComponent(groupId)}` : '';
-    const classrooms = toList(await apiFetch(token, `/classrooms${qs}`));
+
+    // Fetch classrooms and path map in parallel — path map is used to resolve
+    // "Book now" URLs: each path step with type "classroom" maps classroomId → path URL
+    const [classrooms, pathMap] = await Promise.all([
+      apiFetch(token, `/classrooms${qs}`).then(toList),
+      buildPathMap(token).catch(() => ({})),
+    ]);
 
     const now = new Date();
     const { monday, nextMonday } = getWeekBounds(now);
@@ -181,7 +173,7 @@ module.exports = async function handler(req, res) {
         const classroomId = classroom._id ?? classroom.id;
         const trainerIds = slot.trainerIds ?? [];
 
-        const [trainer, registrationsCount, url] = await Promise.all([
+        const [trainer, registrationsCount] = await Promise.all([
           (async () => {
             if (!trainerIds.length) return null;
             try {
@@ -199,7 +191,6 @@ module.exports = async function handler(req, res) {
               return regs.length;
             } catch { return null; }
           })(),
-          resolvePathUrl(token, classroomId, classroom),
         ]);
 
         const totalCapacity = slot.maxAttendees ?? slot.maxRegistrations ?? slot.capacity ?? null;
@@ -217,7 +208,7 @@ module.exports = async function handler(req, res) {
           startTime: slotStartTime(slot),
           duration: slotDuration(slot),
           category: classroomCategory(classroom),
-          url,
+          url: sessionUrl(classroomId, pathMap),
           trainer,
           registrationsCount,
           totalCapacity,
@@ -242,7 +233,7 @@ module.exports = async function handler(req, res) {
       const slotId = nextSlot._id ?? nextSlot.id;
       const trainerIds = nextSlot.trainerIds ?? [];
 
-      const [trainer, registrationsCount, nextUrl] = await Promise.all([
+      const [trainer, registrationsCount] = await Promise.all([
         (async () => {
           if (!trainerIds.length) return null;
           try {
@@ -257,14 +248,13 @@ module.exports = async function handler(req, res) {
             return regs.length;
           } catch { return null; }
         })(),
-        resolvePathUrl(token, classroomId, nextClassroom),
       ]);
 
       nextSession = {
         name: nextClassroom.name ?? nextClassroom.title ?? 'Upcoming Session',
         date: nextSlot.startDate,
         endDate: nextSlot.endDate ?? null,
-        url: nextUrl,
+        url: sessionUrl(classroomId, pathMap),
         trainer,
         registrationsCount,
       };
